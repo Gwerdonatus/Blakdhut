@@ -6,6 +6,9 @@ import Footer from "../components/Footer";
 export const metadata: Metadata = {
   title: "BLAKDHUT EXCHANGE",
   description: "Fast. Secure. Reliable Crypto Trading.",
+    icons: {
+    icon: "/blakdhut.jpg",
+  },
 };
 
 export default function RootLayout({

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 
 type CGIds = "bitcoin" | "ethereum" | "binancecoin" | "ripple" | "solana";
 
@@ -195,7 +196,13 @@ export default function Hero() {
                     style={{ backgroundColor: COLORS.bg, border: `1px solid ${COLORS.border}` }}
                   >
                     <div className="flex items-center gap-3">
-                      <img src={c.logo} alt={c.symbol} className="h-6 w-6 rounded-full" />
+                      <Image
+                        src={c.logo}
+                        alt={c.symbol}
+                        width={24}
+                        height={24}
+                        className="rounded-full h-6 w-6"
+                      />
                       <span className="text-sm text-white font-semibold">{c.symbol}</span>
                       <span className="text-sm text-[#B7BDC6]">{c.name}</span>
                     </div>

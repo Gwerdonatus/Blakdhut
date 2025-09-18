@@ -50,7 +50,7 @@ const STYLES = [
 
 export default function Testimonials() {
   return (
-    <section  id="testimonials" className="w-full py-20 bg-[#181A20]">
+    <section id="testimonials" className="w-full py-20 bg-[#181A20]">
       <div className="max-w-6xl mx-auto px-6 text-center space-y-12">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#F0B90B]">
           What Our Clients Say
@@ -95,18 +95,16 @@ export default function Testimonials() {
                     alt={t.name}
                     width={40}
                     height={40}
-                    className="rounded-full border-2 border-[#F0B90B]"
+                    className="rounded-full border-2 border-[#F0B90B] object-cover"
                   />
                   <div className="font-semibold text-sm">{t.name}</div>
                 </div>
 
                 {/* Stars */}
                 <div className="flex gap-1 mb-4 text-yellow-400">
-                  {Array(5)
-                    .fill(0)
-                    .map((_, j) => (
-                      <span key={j}>⭐</span>
-                    ))}
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <span key={j}>⭐</span>
+                  ))}
                 </div>
 
                 {/* Text */}

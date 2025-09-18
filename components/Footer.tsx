@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +17,13 @@ export default function Footer() {
         {/* Logo + About */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <img src="/blakdhut.jpg" alt="Blakdhut Logo" className="h-8 w-8 rounded-sm" />
+            <Image
+              src="/blakdhut.jpg"
+              alt="Blakdhut Logo"
+              width={32}
+              height={32}
+              className="rounded-sm h-8 w-8"
+            />
             <span className="text-[#f0b90b] font-extrabold tracking-wide text-lg">
               BLAKDHUT EXCHANGE
             </span>
@@ -54,7 +59,7 @@ export default function Footer() {
           <div className="flex gap-6 items-center">
             <div className="text-center">
               <Image
-                src="/images/TelegramQr.jpg" // put your telegram qr in /public
+                src="/images/TelegramQr.jpg"
                 alt="Telegram QR"
                 width={100}
                 height={100}
@@ -64,7 +69,7 @@ export default function Footer() {
             </div>
             <div className="text-center">
               <Image
-                src="/images/teleQR.jpg" // put your whatsapp qr in /public
+                src="/images/teleQR.jpg"
                 alt="WhatsApp QR"
                 width={100}
                 height={100}

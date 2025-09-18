@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
+import Image from "next/image";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -27,10 +28,12 @@ export default function Header() {
           className="flex items-center gap-2"
           onClick={() => setMobileOpen(false)}
         >
-          <img
+          <Image
             src="/blakdhut.jpg"
             alt="Blakdhut Logo"
-            className="h-8 w-8 rounded-sm"
+            width={32}
+            height={32}
+            className="rounded-sm h-8 w-8"
           />
           <span className="text-[#f0b90b] font-extrabold tracking-wide">
             BLAKDHUT EXCHANGE
