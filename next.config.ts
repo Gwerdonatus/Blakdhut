@@ -5,8 +5,11 @@ const nextConfig: NextConfig = {
     mdxRs: true,
   },
   eslint: {
-    // ✅ Prevents ESLint warnings from failing Vercel builds
     ignoreDuringBuilds: true,
+  },
+  images: {
+    // 👇 This fixes the issue
+    domains: ["cdn.sanity.io"],
   },
 };
 
