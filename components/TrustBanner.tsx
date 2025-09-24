@@ -4,19 +4,7 @@ import Image from "next/image";
 export default function TrustStrip() {
   return (
     <section className="relative w-full py-20 overflow-hidden bg-[#181A20]">
-      {/* Background handshake */}
-      <div className="absolute inset-0">
-        <Image
-          src="/images/trust-lady.jpg"
-          alt="Handshake Trust - Blakdhut"
-          fill
-          className="object-cover opacity-20"
-          priority
-        />
-      </div>
-
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/70 to-transparent"></div>
+      {/* ✅ Background image removed */}
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6 text-center flex flex-col gap-6">

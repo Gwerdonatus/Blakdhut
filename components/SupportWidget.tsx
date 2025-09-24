@@ -42,7 +42,7 @@ export default function SupportWidget() {
 
           <div className="flex flex-col gap-3">
             <a
-              href="https://t.me/yourtelegram"
+              href="https://t.me/blakdhute"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-lg text-sm font-medium text-center transition"
@@ -54,7 +54,7 @@ export default function SupportWidget() {
               📲 Chat on Telegram
             </a>
             <a
-              href="https://wa.me/2348116276112"
+              href="https://wa.me/2347080364541"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-lg text-sm font-medium text-center transition border"
@@ -66,7 +66,7 @@ export default function SupportWidget() {
               💬 Chat on WhatsApp
             </a>
             <a
-              href="mailto:donatusgwer@gmail.com"
+              href="mailto:suppor@blakdhut.com"
               className="px-4 py-2 rounded-lg text-sm font-medium text-center transition border"
               style={{
                 borderColor: COLORS.border,

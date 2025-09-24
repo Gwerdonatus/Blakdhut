@@ -1,46 +1,51 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import useSWR from "swr";
+import Link from "next/link";
+import { client } from "../lib/sanity.client";
+import { urlFor } from "../lib/sanity.image";
 
-type CGIds = "bitcoin" | "ethereum" | "binancecoin" | "ripple" | "solana";
+// ---------------- Types ----------------
+type PriceData = { usd: number; usd_24h_change: number };
 
 type CoinRow = {
-  id: CGIds;
+  id: string;
   symbol: string;
   name: string;
-  logo: string;
+  logo: string | any;
 };
 
-type PriceData = {
-  usd: number;
-  usd_24h_change: number;
-};
-
-const COINS: CoinRow[] = [
-  { id: "bitcoin",     symbol: "BTC", name: "Bitcoin",  logo: "/coins/bitcoin.jpeg" },
-  { id: "ethereum",    symbol: "ETH", name: "Ethereum", logo: "/coins/ethereum.jpg" },
-  { id: "binancecoin", symbol: "BNB", name: "BNB",      logo: "/coins/bnb.jpg" },
-  { id: "ripple",      symbol: "XRP", name: "XRP",      logo: "/coins/xrp.jpg" },
-  { id: "solana",      symbol: "SOL", name: "Solana",   logo: "/coins/sol.jpg" },
+// ---------------- Static Popular Coins ----------------
+const POPULAR_COINS: CoinRow[] = [
+  { id: "bitcoin", symbol: "BTC", name: "Bitcoin", logo: "/coins/bitcoin.jpeg" },
+  { id: "ethereum", symbol: "ETH", name: "Ethereum", logo: "/coins/ethereum.jpg" },
+  { id: "binancecoin", symbol: "BNB", name: "BNB", logo: "/coins/bnb.jpg" },
+  { id: "ripple", symbol: "XRP", name: "XRP", logo: "/coins/xrp.jpg" },
+  { id: "solana", symbol: "SOL", name: "Solana", logo: "/coins/sol.jpg" },
 ];
 
+// ---------------- Colors ----------------
 const COLORS = {
-  bg:      "#181A20",
-  panel:   "#1E2329",
-  text:    "#EAECEF",
+  bg: "#181A20",
+  panel: "#1E2329",
+  yellow: "#F0B90B",
+  green: "#0ECB81",
+  red: "#F6465D",
+  border: "#2B3139",
   subtext: "#B7BDC6",
-  yellow:  "#F0B90B",
-  green:   "#0ECB81",
-  red:     "#F6465D",
-  border:  "#2B3139",
 };
 
+// ---------------- Sanity Fetch ----------------
+const fetcher = (query: string) => client.fetch(query);
+
 export default function Hero() {
+  // Animated counter
   const [moved, setMoved] = useState<number>(4667380);
   const [displayed, setDisplayed] = useState<number>(4667380);
   const animationFrame = useRef<number | null>(null);
 
-  // Load + persist value in localStorage
   useEffect(() => {
     const saved = localStorage.getItem("blakdhut_moved");
     if (saved) {
@@ -65,7 +70,6 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
-  // Smooth animation
   useEffect(() => {
     const animate = () => {
       setDisplayed((prev) => {
@@ -76,12 +80,9 @@ export default function Hero() {
       });
       animationFrame.current = requestAnimationFrame(animate);
     };
-
     animationFrame.current = requestAnimationFrame(animate);
     return () => {
-      if (animationFrame.current !== null) {
-        cancelAnimationFrame(animationFrame.current);
-      }
+      if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
     };
   }, [moved]);
 
@@ -89,47 +90,91 @@ export default function Hero() {
   const TABS = ["Popular", "New Listing"] as const;
   const [active, setActive] = useState<typeof TABS[number]>("Popular");
 
-  // Live prices
-  const [data, setData] = useState<Record<CGIds, PriceData>>({
-    bitcoin: { usd: 0, usd_24h_change: 0 },
-    ethereum: { usd: 0, usd_24h_change: 0 },
-    binancecoin: { usd: 0, usd_24h_change: 0 },
-    ripple: { usd: 0, usd_24h_change: 0 },
-    solana: { usd: 0, usd_24h_change: 0 },
-  });
+  // Fetch new coins
+  const { data: newCoins } = useSWR(
+    `*[_type == "coin" && isNewListing == true] | order(_createdAt desc)[0...5]{
+      _id,
+      name,
+      symbol,
+      coingeckoId,
+      logo
+    }`,
+    fetcher
+  );
 
-  const fetchData = async () => {
+  // Fetch latest news
+  const { data: latestNews } = useSWR(
+    `*[_type == "post"] | order(publishedAt desc)[0...3]{
+      _id,
+      title,
+      slug,
+      publishedAt
+    }`,
+    fetcher
+  );
+
+  // Prices
+  const [prices, setPrices] = useState<Record<string, PriceData>>({});
+  const [priceError, setPriceError] = useState<boolean>(false);
+
+  const fetchPrices = async (ids: string[]) => {
+    if (!ids.length) return;
     try {
-      const ids = COINS.map((c) => c.id).join(",");
-      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(
+        ","
+      )}&vs_currencies=usd&include_24hr_change=true`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network error");
-      const json: Record<CGIds, PriceData> = await res.json();
-      setData(json);
+      const json: Record<string, PriceData> = await res.json();
+      setPrices(json);
+      setPriceError(false);
     } catch (e) {
       console.error("Price fetch failed", e);
+      setPriceError(true);
     }
   };
 
   useEffect(() => {
-    fetchData();
-    const id = setInterval(fetchData, 60_000);
-    return () => clearInterval(id);
-  }, []);
+    const ids =
+      active === "Popular"
+        ? POPULAR_COINS.map((c) => c.id)
+        : newCoins?.map((c: any) => c.coingeckoId) || [];
 
-  const list = useMemo(() => {
-    return active === "Popular" ? COINS : [...COINS].reverse();
-  }, [active]);
+    if (ids.length) fetchPrices(ids);
+    const interval = setInterval(() => fetchPrices(ids), 60_000);
+    return () => clearInterval(interval);
+  }, [active, newCoins]);
+
+  // Coin list
+  const list: CoinRow[] = useMemo(() => {
+    if (active === "Popular") return POPULAR_COINS;
+    if (newCoins?.length) {
+      return newCoins.map((c: any) => ({
+        id: c.coingeckoId,
+        symbol: c.symbol,
+        name: c.name,
+        logo: c.logo,
+      }));
+    }
+    return [];
+  }, [active, newCoins]);
 
   return (
     <section
       style={{ backgroundColor: COLORS.bg }}
-      className="w-full min-h-screen flex items-center pt-0 lg:pt-5"
+      className="w-full min-h-screen flex flex-col items-center pt-4 lg:pt-6"
     >
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-stretch">
-        {/* Left */}
+      {/* Error Banner */}
+      {priceError && (
+        <div className="w-full bg-[#F6465D] text-white text-center py-2 text-sm font-medium">
+          ⚠️ Live prices are temporarily unavailable. Retrying...
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 w-full items-start">
+        {/* Left: Counter + Info */}
         <div className="flex flex-col justify-center gap-6 text-center lg:text-left">
-          <div className="text-[38px] sm:text-[50px] lg:text-[68px] font-extrabold text-[#F0B90B] tracking-tight">
+          <div className="text-[50px] sm:text-[72px] lg:text-[92px] font-extrabold text-[#F0B90B] tracking-tight leading-tight">
             ${displayed.toLocaleString()}
           </div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-snug">
@@ -141,7 +186,6 @@ export default function Hero() {
             businesses who demand speed, transparency, and reliability in every
             crypto trade.
           </p>
-
           <div className="flex justify-center lg:justify-start mt-6">
             <a
               href="https://t.me/blakdhute"
@@ -153,10 +197,11 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: Coin Panel */}
-        <div className="flex h-full">
+        {/* Right: Coins + News */}
+        <div className="flex flex-col gap-6 w-full">
+          {/* Coin Panel */}
           <div
-            className="rounded-2xl p-5 lg:p-6 w-full flex flex-col justify-between"
+            className="rounded-2xl p-5 lg:p-6 w-full"
             style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
           >
             {/* Tabs */}
@@ -177,17 +222,17 @@ export default function Hero() {
                 ))}
               </div>
               <a href="#" className="text-xs text-[#B7BDC6] hover:text-white">
-                View All 350+ Coins &gt;
+               &gt;
               </a>
             </div>
 
             {/* Prices */}
-            <div className="mt-4 space-y-3 flex-1">
+            <div className="mt-4 space-y-3">
               {list.map((c) => {
-                const row = data[c.id];
-                const price = row?.usd ?? 0;
-                const change = row?.usd_24h_change ?? 0;
-                const changeColor = change >= 0 ? COLORS.green : COLORS.red;
+                const row = prices[c.id];
+                const price = row?.usd ?? null;
+                const change = row?.usd_24h_change ?? null;
+                const changeColor = change && change >= 0 ? COLORS.green : COLORS.red;
 
                 return (
                   <div
@@ -197,7 +242,11 @@ export default function Hero() {
                   >
                     <div className="flex items-center gap-3">
                       <Image
-                        src={c.logo}
+                        src={
+                          typeof c.logo === "string"
+                            ? c.logo
+                            : urlFor(c.logo).width(40).height(40).url()
+                        }
                         alt={c.symbol}
                         width={24}
                         height={24}
@@ -208,13 +257,58 @@ export default function Hero() {
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="text-sm text-white font-medium">
-                        {price ? `$${price.toLocaleString()}` : "—"}
+                        {price ? `$${price.toLocaleString()}` : "— Price unavailable"}
                       </span>
-                      <span className="text-sm font-medium" style={{ color: changeColor }}>
-                        {price ? `${change.toFixed(2)}%` : ""}
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: change ? changeColor : COLORS.subtext }}
+                      >
+                        {change ? `${change.toFixed(2)}%` : "—"}
                       </span>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* News Panel */}
+          <div
+            className="rounded-2xl p-5 lg:p-6 w-full"
+            style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
+          >
+            <div className="flex items-center justify-between border-b border-[#2B3139] pb-2 mb-3">
+              <h2 className="text-sm font-semibold text-white">News</h2>
+              <Link href="/news" className="text-xs text-[#B7BDC6] hover:text-white">
+                View All News &gt;
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              {latestNews?.map((post: any) => {
+                const date = new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
+                return (
+                  <Link
+                    key={post._id}
+                    href={`/news/${post.slug.current}`}
+                    className="block group"
+                  >
+                    <div className="flex items-center justify-between">
+                      {/* Title */}
+                      <span className="text-sm text-[#B7BDC6] group-hover:text-white truncate">
+                        {post.title}
+                      </span>
+
+                      {/* Dot + Date */}
+                      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                        <span className="w-1 h-1 rounded-full bg-[#6E767D]"></span>
+                        <span className="text-xs text-[#6E767D]">{date}</span>
+                      </div>
+                    </div>
+                  </Link>
                 );
               })}
             </div>

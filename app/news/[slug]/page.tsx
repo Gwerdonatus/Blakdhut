@@ -7,8 +7,8 @@ import useSWR from "swr";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import { FiShare2, FiCopy } from "react-icons/fi";
 import { FaWhatsapp, FaTelegramPlane, FaTwitter } from "react-icons/fa";
-import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
+import { client } from "@/lib/sanity/lib/client";
+import { urlFor } from "@/lib/sanity/lib/image";
 
 export default function NewsPost({ params }: { params: Promise<{ slug: string }> }) {
   // ✅ unwrap params

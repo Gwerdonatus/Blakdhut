@@ -23,11 +23,11 @@ const FAQS = [
   },
   {
     q: "Countries served?",
-    a: "Serving Clients Across 4 Countries\nTrusted by traders in Nigeria, Ghana, Cameroon, and the United States.",
+    a: "Currently, We have Traded With Clients In Nigeria, Ghana, Cameroon And the United States\nAnd We Are Expanding Globally.",
   },
   {
     q: "Average processing time?",
-    a: "Reliable Speed\nOn average, trades process in 5–10 minutes, with a guaranteed delivery window of 15–45 minutes.",
+    a: "Reliable Speed\nTrades typically process in 5–10 minutes, and always within 15–45 minutes. In the rare event of bank or network issues, we will keep you updated every step of the way.",
   },
   {
     q: "Do users receive blockchain confirmation receipts for all transactions?",
@@ -42,10 +42,35 @@ const FAQS = [
     a: "Real Humans, Anytime\nEvery client has direct access to our team 24/7. No automated replies, no waiting days for answers — just fast, personal support.",
   },
   {
-    q: "Is my money actually safe with you?",
+    q: "Is my money actually safe ?",
     a: "Safe, Verified, and Transparent\nYour money is safe with Blakdhut. We only work with verified clients (KYC), provide proof for every trade, and have maintained a flawless zero-breach record since launch.",
   },
+  {
+    q: "Which payment methods do you support?",
+    a: "We support bank transfers, crypto-to-crypto swaps, and fiat payments via trusted banking partners. More options are being added regularly.",
+  },
+  {
+    q: "Can I trade from outside Nigeria?",
+    a: "Yes. Blakdhut already serves clients in Ghana, Cameroon, and the U.S., and we are expanding globally.",
+  },
+  {
+    q: "Do you offer large-volume (OTC) trading?",
+    a: "Yes. For high-net-worth clients and businesses, we offer over-the-counter (OTC) services with personalized support and competitive rates.",
+  },
+  {
+    q: "How do I contact Blakdhut support?",
+    a: "You can reach us via Telegram (@blakdhutexchange), WhatsApp channel, or through our website contact form. Our team replies instantly 24/7.",
+  },
+  {
+    q: "Why do we ask for KYC (Know Your Customer)?",
+    a: "We require KYC to protect both our customers and our platform. It helps us:\n\n• Prevent fraud and scams – Verifying identity makes it harder for bad actors to misuse accounts.\n• Comply with regulations – Financial laws require exchanges to know who is trading to stop money laundering and terrorist financing.\n• Increase trust and security – Verified accounts enjoy safer transactions, fewer restrictions, and faster issue resolution.\n• Enable higher limits – Completing KYC gives you access to bigger transaction limits and full platform features.",
+  },
+  {
+    q: "What documents are accepted for KYC?",
+    a: "To complete your verification, we accept any one of the following valid government-issued IDs:\n\n• National Identity Card (NIN Slip or NIN Card)\n• International Passport\n• Driver's License\n• Permanent Voter's Card\n\nYou may also be asked to provide:\n• A recent utility bill, bank statement, or proof of address (not older than 3 months).\n• A selfie to confirm you are the true owner of the submitted document.",
+  },
 ];
+
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);

@@ -5,8 +5,8 @@ import Image from "next/image";
 import useSWR from "swr";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import { FiShare2 } from "react-icons/fi";
-import { urlFor } from "@/sanity/lib/image"; // sanity helper
-import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/lib/sanity/lib/image"; // sanity helper
+import { client } from "@/lib/sanity/lib/client";
 
 // Fetch posts from Sanity
 const fetcher = (query: string) => client.fetch(query);

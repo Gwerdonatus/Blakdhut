@@ -82,7 +82,7 @@ export default function Services() {
               {/* Slim Button */}
               <div className="mt-3">
                 <Link
-                  href={s.link}
+                  href="/policies#about-video"
                   className="inline-block px-4 py-1.5 rounded-md font-medium text-sm transition"
                   style={{
                     backgroundColor: COLORS.yellow,

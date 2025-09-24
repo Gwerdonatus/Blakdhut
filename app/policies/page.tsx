@@ -17,7 +17,7 @@ export default function PoliciesPage() {
           </h1>
 
           {/* Video with gradient background */}
-          <div className="relative rounded-xl overflow-hidden shadow-lg aspect-video">
+          <div id="about-video" className="relative rounded-xl overflow-hidden shadow-lg aspect-video">
             <div className="absolute inset-0 bg-gradient-to-b from-[#0b0e11]/50 to-transparent z-10"></div>
             <iframe
               className="w-full h-full relative z-20"
