@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.blakdhut.com
+
+# Sitemaps
+Sitemap: https://www.blakdhut.com/sitemap.xml
