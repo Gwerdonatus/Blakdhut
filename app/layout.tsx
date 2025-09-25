@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/Header";
@@ -19,6 +20,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/blakdhut.jpg",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -49,12 +52,37 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
+      <head>
+        {/* ✅ Mobile optimization */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <body className="bg-[#181A20] text-white">
         <Header />
-        {/* slightly reduced top padding on desktop */}
-        <main className="pt-16 lg:pt-8">{children}</main>
+        {/* ✅ removed padding here */}
+        <main>{children}</main>
         <Footer />
+
+        {/* ✅ Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: siteName,
+              url: siteUrl,
+              logo: `${siteUrl}/blakdhut.jpg`,
+              sameAs: [
+                "https://x.com/blakdhute",
+                "https://www.instagram.com/blakdhute",
+                "https://t.me/blakdhutexchange",
+                "https://whatsapp.com/channel/0029Vaff2PW3rZZVjeJfLr1U",
+                "https://www.tiktok.com/@blakdhute",
+              ],
+            }),
+          }}
+        />
       </body>
     </html>
   );

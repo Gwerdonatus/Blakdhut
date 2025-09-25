@@ -1,30 +1,29 @@
-import type { Config } from "tailwindcss";
+// next.config.ts
+import type { NextConfig } from "next";
 
-const config: Config = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {
-      colors: {
-        brand: {
-          DEFAULT: "#facc15", // yellow (primary)
-          dark: "#ca8a04",    // darker yellow
-        },
-        dark: {
-          DEFAULT: "#0a0a0a", // almost black background
-          light: "#1a1a1a",   // lighter black/gray
-        },
-      },
-      fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-      },
-      boxShadow: {
-        soft: "0 4px 20px rgba(250, 204, 21, 0.2)", // yellow glow
-      },
-    },
+const nextConfig: NextConfig = {
+  experimental: {
+    mdxRs: true,
   },
-  plugins: [],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
+    remotePatterns: [
+      // sanity asset CDN
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        pathname: "/images/**",
+      },
+      // optional: if you use Unsplash or external logos later
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
+  output: "standalone",
 };
-export default config;
+
+export default nextConfig;
