@@ -2,31 +2,29 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import useSWR from "swr";
 import Link from "next/link";
+import useSWR from "swr";
 import { client } from "../lib/sanity.client";
 import { urlFor } from "../lib/sanity.image";
 
-// ---------------- Types ----------------
 type PriceData = { usd: number; usd_24h_change: number };
 
 type CoinRow = {
-  id: string;
-  symbol: string;
-  name: string;
-  logo: string | any;
+  id: string;              // coingecko id (e.g. "bitcoin")
+  symbol: string;          // e.g. "BTC"
+  name: string;            // e.g. "Bitcoin"
+  logo: string | any;      // local path or Sanity image object
 };
 
-// ---------------- Static Popular Coins ----------------
+// Static Popular list (unchanged)
 const POPULAR_COINS: CoinRow[] = [
-  { id: "bitcoin", symbol: "BTC", name: "Bitcoin", logo: "/coins/bitcoin.jpeg" },
-  { id: "ethereum", symbol: "ETH", name: "Ethereum", logo: "/coins/ethereum.jpg" },
-  { id: "binancecoin", symbol: "BNB", name: "BNB", logo: "/coins/bnb.jpg" },
-  { id: "ripple", symbol: "XRP", name: "XRP", logo: "/coins/xrp.jpg" },
-  { id: "solana", symbol: "SOL", name: "Solana", logo: "/coins/sol.jpg" },
+  { id: "bitcoin",     symbol: "BTC", name: "Bitcoin",  logo: "/coins/bitcoin.jpeg" },
+  { id: "ethereum",    symbol: "ETH", name: "Ethereum", logo: "/coins/ethereum.jpg" },
+  { id: "binancecoin", symbol: "BNB", name: "BNB",      logo: "/coins/bnb.jpg" },
+  { id: "ripple",      symbol: "XRP", name: "XRP",      logo: "/coins/xrp.jpg" },
+  { id: "solana",      symbol: "SOL", name: "Solana",   logo: "/coins/sol.jpg" },
 ];
 
-// ---------------- Colors ----------------
 const COLORS = {
   bg: "#181A20",
   panel: "#1E2329",
@@ -37,60 +35,73 @@ const COLORS = {
   subtext: "#B7BDC6",
 };
 
-// ---------------- Sanity Fetch ----------------
+// Sanity fetcher (SWR)
 const fetcher = (query: string) => client.fetch(query);
 
+// Prices fetcher (hits our server cache instead of CoinGecko directly)
+async function fetchPrices(ids: string[]): Promise<Record<string, PriceData>> {
+  if (!ids.length) return {};
+  const params = new URLSearchParams();
+  params.set("ids", ids.join(","));
+  const res = await fetch(`/api/prices?${params.toString()}`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error("Price API error");
+  return res.json();
+}
+
 export default function Hero() {
-  // Animated counter
+  // Animated moved number
   const [moved, setMoved] = useState<number>(4667380);
   const [displayed, setDisplayed] = useState<number>(4667380);
-  const animationFrame = useRef<number | null>(null);
+  const frame = useRef<number | null>(null);
 
+  // Error banner for price fetch
+  const [priceError, setPriceError] = useState<boolean>(false);
+
+  // Persist & tick moved value
   useEffect(() => {
     const saved = localStorage.getItem("blakdhut_moved");
     if (saved) {
-      const val = parseInt(saved, 10);
-      if (!isNaN(val)) {
-        setMoved(val);
-        setDisplayed(val);
+      const v = parseInt(saved, 10);
+      if (!isNaN(v)) {
+        setMoved(v);
+        setDisplayed(v);
       }
     } else {
       localStorage.setItem("blakdhut_moved", "4667380");
     }
-
-    const interval = setInterval(() => {
-      const increment = Math.floor(Math.random() * 500) + 1;
+    const id = setInterval(() => {
+      const inc = Math.floor(Math.random() * 500) + 1;
       setMoved((prev) => {
-        const newValue = prev + increment;
-        localStorage.setItem("blakdhut_moved", newValue.toString());
-        return newValue;
+        const next = prev + inc;
+        localStorage.setItem("blakdhut_moved", String(next));
+        return next;
       });
     }, 5000);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(id);
   }, []);
 
+  // Smooth number animation
   useEffect(() => {
-    const animate = () => {
+    const loop = () => {
       setDisplayed((prev) => {
         if (prev === moved) return prev;
         const diff = moved - prev;
         const step = Math.ceil(diff / 20);
         return prev + step;
       });
-      animationFrame.current = requestAnimationFrame(animate);
+      frame.current = requestAnimationFrame(loop);
     };
-    animationFrame.current = requestAnimationFrame(animate);
+    frame.current = requestAnimationFrame(loop);
     return () => {
-      if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+      if (frame.current) cancelAnimationFrame(frame.current);
     };
   }, [moved]);
 
   // Tabs
   const TABS = ["Popular", "New Listing"] as const;
-  const [active, setActive] = useState<typeof TABS[number]>("Popular");
+  const [active, setActive] = useState<(typeof TABS)[number]>("Popular");
 
-  // Fetch new coins
+  // New coins from Sanity (limit 5, flagged for “isNewListing”)
   const { data: newCoins } = useSWR(
     `*[_type == "coin" && isNewListing == true] | order(_createdAt desc)[0...5]{
       _id,
@@ -102,7 +113,7 @@ export default function Hero() {
     fetcher
   );
 
-  // Fetch latest news
+  // Latest news (3 items)
   const { data: latestNews } = useSWR(
     `*[_type == "post"] | order(publishedAt desc)[0...3]{
       _id,
@@ -113,39 +124,33 @@ export default function Hero() {
     fetcher
   );
 
-  // Prices
+  // Prices state
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
-  const [priceError, setPriceError] = useState<boolean>(false);
 
-  const fetchPrices = async (ids: string[]) => {
-    if (!ids.length) return;
-    try {
-      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(
-        ","
-      )}&vs_currencies=usd&include_24hr_change=true`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Network error");
-      const json: Record<string, PriceData> = await res.json();
-      setPrices(json);
-      setPriceError(false);
-    } catch (e) {
-      console.error("Price fetch failed", e);
-      setPriceError(true);
-    }
-  };
-
+  // Re-fetch prices per tab (cached by our API)
   useEffect(() => {
     const ids =
       active === "Popular"
         ? POPULAR_COINS.map((c) => c.id)
-        : newCoins?.map((c: any) => c.coingeckoId) || [];
+        : (newCoins?.map((c: any) => c.coingeckoId) ?? []);
 
-    if (ids.length) fetchPrices(ids);
-    const interval = setInterval(() => fetchPrices(ids), 60_000);
-    return () => clearInterval(interval);
+    if (!ids.length) return;
+
+    fetchPrices(ids)
+      .then((data) => {
+        setPrices(data);
+        setPriceError(false);
+      })
+      .catch(() => setPriceError(true));
+
+    const t = setInterval(() => {
+      fetchPrices(ids).then(setPrices).catch(() => setPriceError(true));
+    }, 60_000);
+
+    return () => clearInterval(t);
   }, [active, newCoins]);
 
-  // Coin list
+  // Which list to render
   const list: CoinRow[] = useMemo(() => {
     if (active === "Popular") return POPULAR_COINS;
     if (newCoins?.length) {
@@ -164,15 +169,15 @@ export default function Hero() {
       style={{ backgroundColor: COLORS.bg }}
       className="w-full min-h-screen flex flex-col items-center pt-4 lg:pt-6"
     >
-      {/* Error Banner */}
+      {/* error banner */}
       {priceError && (
         <div className="w-full bg-[#F6465D] text-white text-center py-2 text-sm font-medium">
-          ⚠️ Live prices are temporarily unavailable. Retrying...
+          ⚠️ Live prices are temporarily unavailable. Retrying…
         </div>
       )}
 
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 w-full items-start">
-        {/* Left: Counter + Info */}
+        {/* Left side: headline */}
         <div className="flex flex-col justify-center gap-6 text-center lg:text-left">
           <div className="text-[50px] sm:text-[72px] lg:text-[92px] font-extrabold text-[#F0B90B] tracking-tight leading-tight">
             ${displayed.toLocaleString()}
@@ -186,7 +191,7 @@ export default function Hero() {
             businesses who demand speed, transparency, and reliability in every
             crypto trade.
           </p>
-          <div className="flex justify-center lg:justify-start mt-6">
+          <div className="flex justify-center lg:justify-start mt-2">
             <a
               href="https://t.me/blakdhute"
               className="px-6 py-3 rounded-lg font-semibold text-lg shadow-md transition"
@@ -197,14 +202,13 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: Coins + News */}
+        {/* Right: coins + news box */}
         <div className="flex flex-col gap-6 w-full">
-          {/* Coin Panel */}
+          {/* Coin panel */}
           <div
             className="rounded-2xl p-5 lg:p-6 w-full"
             style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
           >
-            {/* Tabs */}
             <div className="flex items-center justify-between border-b border-[#2B3139] pb-2">
               <div className="flex gap-6">
                 {TABS.map((t) => (
@@ -222,11 +226,10 @@ export default function Hero() {
                 ))}
               </div>
               <a href="#" className="text-xs text-[#B7BDC6] hover:text-white">
-               &gt;
+                View All 350+ Coins &gt;
               </a>
             </div>
 
-            {/* Prices */}
             <div className="mt-4 space-y-3">
               {list.map((c) => {
                 const row = prices[c.id];
@@ -272,7 +275,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* News Panel */}
+          {/* News panel under coins (like Binance) */}
           <div
             className="rounded-2xl p-5 lg:p-6 w-full"
             style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
@@ -284,33 +287,18 @@ export default function Hero() {
               </Link>
             </div>
 
-            <div className="space-y-3">
-              {latestNews?.map((post: any) => {
-                const date = new Date(post.publishedAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-                return (
-                  <Link
-                    key={post._id}
-                    href={`/news/${post.slug.current}`}
-                    className="block group"
-                  >
-                    <div className="flex items-center justify-between">
-                      {/* Title */}
-                      <span className="text-sm text-[#B7BDC6] group-hover:text-white truncate">
-                        {post.title}
-                      </span>
-
-                      {/* Dot + Date */}
-                      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                        <span className="w-1 h-1 rounded-full bg-[#6E767D]"></span>
-                        <span className="text-xs text-[#6E767D]">{date}</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+            <div className="space-y-2">
+              {latestNews?.map((post: any) => (
+                <Link
+                  key={post._id}
+                  href={`/news/${post.slug.current}`}
+                  className="block text-sm text-[#B7BDC6] hover:text-white"
+                >
+                  {post.title}
+                </Link>
+              )) ?? (
+                <div className="text-sm text-[#B7BDC6]">No articles yet.</div>
+              )}
             </div>
           </div>
         </div>
