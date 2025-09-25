@@ -3,62 +3,57 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+const siteName = "BLAKDHUT EXCHANGE";
+const siteUrl = "https://www.blakdhut.com";
+const siteDesc = "Fast. Secure. Reliable Crypto Trading.";
+
 export const metadata: Metadata = {
-  title: "BLAKDHUT EXCHANGE",
-  description: "Fast. Secure. Reliable Crypto Trading.",
-  keywords: [
-    "Blakdhut",
-    "Crypto Exchange",
-    "Bitcoin",
-    "Ethereum",
-    "BNB",
-    "Solana",
-    "Crypto Trading Nigeria",
-    "Buy and Sell Crypto",
-  ],
-  authors: [{ name: "Blakdhut Team" }],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDesc,
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/blakdhut.jpg",
   },
   openGraph: {
     type: "website",
-    url: "https://www.blakdhut.com",
-    title: "BLAKDHUT EXCHANGE",
-    description: "Fast. Secure. Reliable Crypto Trading.",
-    siteName: "Blakdhut Exchange",
+    url: siteUrl,
+    siteName,
+    title: siteName,
+    description: siteDesc,
     images: [
       {
-        url: "https://www.blakdhut.com/blakdhut.jpg",
+        url: "/blakdhut-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Blakdhut Exchange Logo",
+        alt: "BLAKDHUT",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@blakdhute",
-    title: "BLAKDHUT EXCHANGE",
-    description: "Fast. Secure. Reliable Crypto Trading.",
-    images: ["https://www.blakdhut.com/blakdhut.jpg"],
+    title: siteName,
+    description: siteDesc,
+    images: ["/blakdhut-og.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="bg-[#181A20] text-white">
-        {/* Global Header */}
         <Header />
-
-        {/* Page content */}
-        <main className="pt-20">{children}</main>
-
-        {/* Global Footer */}
+        {/* slightly reduced top padding on desktop */}
+        <main className="pt-16 lg:pt-8">{children}</main>
         <Footer />
       </body>
     </html>

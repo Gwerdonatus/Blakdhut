@@ -1,3 +1,4 @@
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,8 +9,14 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    // 👇 This fixes the issue
-    domains: ["cdn.sanity.io"],
+    remotePatterns: [
+      // sanity asset CDN
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        pathname: "/images/**",
+      },
+    ],
   },
 };
 

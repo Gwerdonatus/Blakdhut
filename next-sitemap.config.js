@@ -10,18 +10,17 @@ module.exports = {
 
   transform: async (config, path) => {
     return {
-      loc: path, // keep default
+      loc: path,
       changefreq: config.changefreq,
       priority: config.priority,
       lastmod: new Date().toISOString(),
     };
   },
 
-  // ✅ Add Sanity posts dynamically
   additionalPaths: async (config) => {
-    // Replace with your real Sanity details
     const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
     const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+    if (!projectId) return [];
 
     const query = encodeURIComponent(`*[_type == "post"]{ "slug": slug.current }`);
     const url = `https://${projectId}.api.sanity.io/v1/data/query/${dataset}?query=${query}`;
@@ -29,17 +28,15 @@ module.exports = {
     try {
       const res = await fetch(url);
       const data = await res.json();
+      const results = data?.result ?? [];
 
-      if (!data.result) return [];
-
-      return data.result.map((post) => ({
+      return results.map((post) => ({
         loc: `/news/${post.slug}`,
         changefreq: "daily",
         priority: 0.7,
         lastmod: new Date().toISOString(),
       }));
-    } catch (err) {
-      console.error("❌ Failed to fetch Sanity posts for sitemap:", err);
+    } catch {
       return [];
     }
   },
