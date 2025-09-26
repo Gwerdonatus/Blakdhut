@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 const siteName = "BLAKDHUT EXCHANGE";
 const siteUrl = "https://www.blakdhut.com";
 const siteDesc = "Fast. Secure. Reliable Crypto Trading.";
+const siteImage = `${siteUrl}/images/blakdhut.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     "secure crypto trading",
   ],
   icons: {
-    icon: "/blakdhut.jpg",
+    icon: "/images/blakdhut.jpg",
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
@@ -38,10 +39,10 @@ export const metadata: Metadata = {
     description: siteDesc,
     images: [
       {
-        url: "/blakdhut-og.jpg",
+        url: siteImage,
         width: 1200,
         height: 630,
-        alt: "BLAKDHUT",
+        alt: "Blakdhut Exchange",
       },
     ],
     locale: "en_NG",
@@ -50,14 +51,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteName,
     description: siteDesc,
-    images: ["/blakdhut-og.jpg"],
+    images: [siteImage],
   },
   robots: {
     index: true,
     follow: true,
   },
   verification: {
-    google: "", // ✅ Add Google Search Console verification when available
+    google: "", // ✅ Add your Google Search Console verification code here
   },
 };
 
@@ -67,6 +68,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href={siteUrl} />
+
+        {/* ✅ Explicit fallbacks for scrapers */}
+        <meta property="og:image" content={siteImage} />
+        <meta name="twitter:image" content={siteImage} />
       </head>
       <body className="bg-[#181A20] text-white flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header />
@@ -82,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@type": "Organization",
               name: siteName,
               url: siteUrl,
-              logo: `${siteUrl}/blakdhut.jpg`,
+              logo: siteImage,
               sameAs: [
                 "https://x.com/blakdhute",
                 "https://www.instagram.com/blakdhute",
