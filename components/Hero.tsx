@@ -178,13 +178,22 @@ export default function Hero() {
             businesses who demand speed, transparency, and reliability in every
             crypto trade.
           </p>
-          <div className="flex justify-center lg:justify-start mt-4">
+          {/* ✅ Added bottom margin here */}
+          <br />
+          <b></b>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4 mb-6 sm:mb-8 lg:mb-10">
             <a
               href="https://t.me/blakdhute"
               className="px-6 py-3 rounded-lg font-semibold text-lg shadow-md transition"
               style={{ backgroundColor: COLORS.yellow, color: "#0B0E11" }}
             >
               Buy / Sell Crypto
+            </a>
+            <a
+              href="/community"
+              className="px-6 py-3 rounded-lg font-semibold text-lg shadow-md border border-[#F0B90B] text-[#F0B90B] transition hover:bg-[#F0B90B] hover:text-[#0B0E11]"
+            >
+              Join Our Community
             </a>
           </div>
         </div>

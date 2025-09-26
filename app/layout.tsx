@@ -16,8 +16,16 @@ export const metadata: Metadata = {
   },
   description: siteDesc,
   alternates: {
-    canonical: "/",
+    canonical: siteUrl,
   },
+  keywords: [
+    "Blakdhut",
+    "crypto exchange Nigeria",
+    "buy crypto",
+    "sell crypto",
+    "swap crypto",
+    "secure crypto trading",
+  ],
   icons: {
     icon: "/blakdhut.jpg",
     shortcut: "/favicon.ico",
@@ -37,6 +45,7 @@ export const metadata: Metadata = {
         alt: "BLAKDHUT",
       },
     ],
+    locale: "en_NG",
   },
   twitter: {
     card: "summary_large_image",
@@ -48,19 +57,26 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: "", // ✅ Add Google Search Console verification when available
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr">
       <head>
-        {/* ✅ Mobile optimization */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="canonical" href={siteUrl} />
       </head>
-      <body className="bg-[#181A20] text-white">
+      <body className="bg-[#181A20] text-white flex flex-col min-h-screen">
+        {/* Fixed header */}
         <Header />
-        {/* ✅ removed padding here */}
-        <main>{children}</main>
+
+        {/* Main content grows between header & footer */}
+        <main className="flex-1">{children}</main>
+
+        {/* Footer */}
         <Footer />
 
         {/* ✅ Structured Data for SEO */}
