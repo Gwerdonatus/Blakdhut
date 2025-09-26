@@ -5,13 +5,11 @@ import Image from "next/image";
 import useSWR from "swr";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import { FiShare2 } from "react-icons/fi";
-import { urlFor } from "@/lib/sanity/lib/image"; // sanity helper
+import { urlFor } from "@/lib/sanity/lib/image";
 import { client } from "@/lib/sanity/lib/client";
 
-// Fetch posts from Sanity
 const fetcher = (query: string) => client.fetch(query);
 
-// Format numbers (e.g. 1200 -> 1.2k, 5000 -> 5k)
 function formatViews(num: number) {
   if (num >= 1000) {
     return (num / 1000).toFixed(1).replace(".0", "") + "k";
@@ -38,12 +36,12 @@ export default function NewsPage() {
 
   return (
     <section className="min-h-screen bg-[#181A20] text-white py-20">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full px-6 sm:px-10 lg:px-16 xl:px-24">
         {/* Header */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-8">
           Blakdhut News & Blog
         </h1>
-        <p className="text-[#B7BDC6] mb-12 max-w-2xl">
+        <p className="text-[#B7BDC6] mb-12 max-w-3xl">
           Stay updated with crypto insights, guides, and the latest updates from
           Blakdhut.
         </p>
@@ -51,7 +49,6 @@ export default function NewsPage() {
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post: any, i: number) => {
-            // Generate random views (1200–5000) once per render
             const views = Math.floor(Math.random() * (5000 - 1200 + 1)) + 1200;
 
             return (
@@ -60,7 +57,7 @@ export default function NewsPage() {
                 href={`/news/${post.slug.current}`}
                 className="rounded-xl overflow-hidden bg-[#1E2329] border border-[#2B3139] hover:scale-[1.02] hover:shadow-lg transition flex flex-col"
               >
-                {/* Thumbnail or Fallback */}
+                {/* Thumbnail */}
                 <div className="relative w-full h-48 flex items-center justify-center">
                   {post.mainImage ? (
                     <Image

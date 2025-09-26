@@ -8,13 +8,7 @@ import { client } from "../lib/sanity.client";
 import { urlFor } from "../lib/sanity.image";
 
 type PriceData = { usd: number; usd_24h_change: number };
-
-type CoinRow = {
-  id: string;
-  symbol: string;
-  name: string;
-  logo: string | any;
-};
+type CoinRow = { id: string; symbol: string; name: string; logo: string | any };
 
 const POPULAR_COINS: CoinRow[] = [
   { id: "bitcoin", symbol: "BTC", name: "Bitcoin", logo: "/coins/bitcoin.jpeg" },
@@ -40,29 +34,26 @@ async function fetchPrices(ids: string[]): Promise<Record<string, PriceData>> {
   if (!ids.length) return {};
   const params = new URLSearchParams();
   params.set("ids", ids.join(","));
-  const res = await fetch(`/api/prices?${params.toString()}`, { next: { revalidate: 60 } });
+  const res = await fetch(`/api/prices?${params.toString()}`, {
+    next: { revalidate: 60 },
+  });
   if (!res.ok) throw new Error("Price API error");
   return res.json();
 }
 
 export default function Hero() {
-  const [moved, setMoved] = useState<number>(4667380);
-  const [displayed, setDisplayed] = useState<number>(4667380);
+  const [moved, setMoved] = useState<number>(10200000); // ✅ Start at 10.2M
+  const [displayed, setDisplayed] = useState<number>(10200000);
   const frame = useRef<number | null>(null);
-
   const [priceError, setPriceError] = useState<boolean>(false);
 
+  // Counter animation
   useEffect(() => {
-    const saved = localStorage.getItem("blakdhut_moved");
-    if (saved) {
-      const v = parseInt(saved, 10);
-      if (!isNaN(v)) {
-        setMoved(v);
-        setDisplayed(v);
-      }
-    } else {
-      localStorage.setItem("blakdhut_moved", "4667380");
-    }
+    const START_VALUE = 10200000;
+    localStorage.setItem("blakdhut_moved", String(START_VALUE));
+    setMoved(START_VALUE);
+    setDisplayed(START_VALUE);
+
     const id = setInterval(() => {
       const inc = Math.floor(Math.random() * 500) + 1;
       setMoved((prev) => {
@@ -71,6 +62,7 @@ export default function Hero() {
         return next;
       });
     }, 5000);
+
     return () => clearInterval(id);
   }, []);
 
@@ -95,33 +87,24 @@ export default function Hero() {
 
   const { data: newCoins } = useSWR(
     `*[_type == "coin" && isNewListing == true] | order(_createdAt desc)[0...5]{
-      _id,
-      name,
-      symbol,
-      coingeckoId,
-      logo
+      _id, name, symbol, coingeckoId, logo
     }`,
     fetcher
   );
 
   const { data: latestNews } = useSWR(
     `*[_type == "post"] | order(publishedAt desc)[0...3]{
-      _id,
-      title,
-      slug,
-      publishedAt
+      _id, title, slug, publishedAt
     }`,
     fetcher
   );
 
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
-
   useEffect(() => {
     const ids =
       active === "Popular"
         ? POPULAR_COINS.map((c) => c.id)
         : (newCoins?.map((c: any) => c.coingeckoId) ?? []);
-
     if (!ids.length) return;
 
     fetchPrices(ids)
@@ -154,34 +137,33 @@ export default function Hero() {
   return (
     <section
       style={{ backgroundColor: COLORS.bg }}
-      className="w-full min-h-screen flex flex-col items-center pt-20 sm:pt-24 lg:pt-28"
+      className="w-full min-h-screen flex items-center py-12 sm:py-16 lg:py-20"
     >
-      {/* Error banner */}
       {priceError && (
         <div className="w-full bg-[#F6465D] text-white text-center py-2 text-sm font-medium">
           ⚠️ Live prices are temporarily unavailable. Retrying…
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-start">
-        {/* Left side: headline */}
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-x-20 xl:gap-x-28 px-6 sm:px-10 lg:px-16 xl:px-32 2xl:px-48">
+        {/* Left side */}
         <div className="flex flex-col justify-center gap-6 text-center lg:text-left">
-          <div className="text-[44px] sm:text-[64px] lg:text-[92px] font-extrabold text-[#F0B90B] tracking-tight leading-tight">
+          <div className="font-extrabold text-[#F0B90B] leading-tight text-[clamp(2.5rem,7vw,8rem)] max-w-[95%] lg:max-w-[600px]">
             ${displayed.toLocaleString()}
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-snug">
+
+          <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-white leading-snug">
             Moved with <span className="text-[#F0B90B]">zero delays</span>,{" "}
             <span className="text-[#F0B90B]">zero scams</span>.
           </h1>
+
           <p className="text-base sm:text-lg text-[#B7BDC6] max-w-xl mx-auto lg:mx-0">
             Blakdhut is the trusted exchange partner for individuals and
             businesses who demand speed, transparency, and reliability in every
             crypto trade.
           </p>
-          {/* ✅ Added bottom margin here */}
-          <br />
-          <b></b>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4 mb-6 sm:mb-8 lg:mb-10">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6">
             <a
               href="https://t.me/blakdhute"
               className="px-6 py-3 rounded-lg font-semibold text-lg shadow-md transition"
@@ -198,12 +180,15 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: coins + news */}
+        {/* Right side */}
         <div className="flex flex-col gap-6 w-full">
           {/* Coin panel */}
           <div
             className="rounded-2xl p-5 lg:p-6 w-full"
-            style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
+            style={{
+              backgroundColor: COLORS.panel,
+              border: `1px solid ${COLORS.border}`,
+            }}
           >
             <div className="flex items-center justify-between border-b border-[#2B3139] pb-2">
               <div className="flex gap-6">
@@ -221,9 +206,6 @@ export default function Hero() {
                   </button>
                 ))}
               </div>
-              <a href="#" className="text-xs text-[#B7BDC6] hover:text-white">
-                &gt;
-              </a>
             </div>
 
             <div className="mt-4 space-y-3">
@@ -231,15 +213,19 @@ export default function Hero() {
                 const row = prices[c.id];
                 const price = row?.usd ?? null;
                 const change = row?.usd_24h_change ?? null;
-                const changeColor = change && change >= 0 ? COLORS.green : COLORS.red;
+                const changeColor =
+                  change && change >= 0 ? COLORS.green : COLORS.red;
 
                 return (
                   <div
                     key={c.id}
-                    className="flex items-center justify-between rounded-xl px-4 py-3"
-                    style={{ backgroundColor: COLORS.bg, border: `1px solid ${COLORS.border}` }}
+                    className="flex flex-wrap sm:flex-nowrap items-center justify-between rounded-xl px-4 py-3"
+                    style={{
+                      backgroundColor: COLORS.bg,
+                      border: `1px solid ${COLORS.border}`,
+                    }}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-[120px]">
                       <Image
                         src={
                           typeof c.logo === "string"
@@ -251,12 +237,16 @@ export default function Hero() {
                         height={24}
                         className="rounded-full h-6 w-6"
                       />
-                      <span className="text-sm text-white font-semibold">{c.symbol}</span>
+                      <span className="text-sm text-white font-semibold">
+                        {c.symbol}
+                      </span>
                       <span className="text-sm text-[#B7BDC6]">{c.name}</span>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4 mt-2 sm:mt-0">
                       <span className="text-sm text-white font-medium">
-                        {price ? `$${price.toLocaleString()}` : "— Price unavailable"}
+                        {price
+                          ? `$${price.toLocaleString()}`
+                          : "— Price unavailable"}
                       </span>
                       <span
                         className="text-sm font-medium"
@@ -274,11 +264,17 @@ export default function Hero() {
           {/* News panel */}
           <div
             className="rounded-2xl p-5 lg:p-6 w-full"
-            style={{ backgroundColor: COLORS.panel, border: `1px solid ${COLORS.border}` }}
+            style={{
+              backgroundColor: COLORS.panel,
+              border: `1px solid ${COLORS.border}`,
+            }}
           >
             <div className="flex items-center justify-between border-b border-[#2B3139] pb-2 mb-3">
               <h2 className="text-sm font-semibold text-white">News</h2>
-              <Link href="/news" className="text-xs text-[#B7BDC6] hover:text-white">
+              <Link
+                href="/news"
+                className="text-xs text-[#B7BDC6] hover:text-white"
+              >
                 View All News &gt;
               </Link>
             </div>

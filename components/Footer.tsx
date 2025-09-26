@@ -21,11 +21,11 @@ const COLORS = {
 export default function Footer() {
   return (
     <footer
-      className="w-full mt-16 border-t"
+      className="w-full border-t"
       style={{ backgroundColor: COLORS.bg, borderColor: COLORS.border }}
     >
       {/* Grid Section */}
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+      <div className="w-full px-6 sm:px-10 lg:px-16 xl:px-24 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
         {/* Brand / About */}
         <div>
           <h2 className="text-white font-bold text-lg mb-3">Blakdhut</h2>
@@ -39,20 +39,20 @@ export default function Footer() {
         {/* QR Codes */}
         <div>
           <h3 className="text-white font-semibold mb-3">Join Us</h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
             <Image
               src="/images/teleQR.jpg"
               alt="WhatsApp QR"
               width={120}
               height={120}
-              className="rounded-lg border border-[#2B3139]"
+              className="rounded-lg border border-[#2B3139] object-contain"
             />
             <Image
               src="/images/TelegramQr.jpg"
               alt="Telegram QR"
               width={120}
               height={120}
-              className="rounded-lg border border-[#2B3139]"
+              className="rounded-lg border border-[#2B3139] object-contain"
             />
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function Footer() {
 
       {/* Bottom note */}
       <div
-        className="text-center py-6 border-t"
+        className="w-full text-center py-6 border-t"
         style={{ borderColor: COLORS.border }}
       >
         <p className="text-sm text-[#B7BDC6]">

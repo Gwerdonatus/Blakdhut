@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/Header";
@@ -69,14 +68,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href={siteUrl} />
       </head>
-      <body className="bg-[#181A20] text-white flex flex-col min-h-screen">
-        {/* Fixed header */}
+      <body className="bg-[#181A20] text-white flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header />
-
-        {/* Main content grows between header & footer */}
-        <main className="flex-1">{children}</main>
-
-        {/* Footer */}
+        <main className="flex-1 w-full">{children}</main>
         <Footer />
 
         {/* ✅ Structured Data for SEO */}

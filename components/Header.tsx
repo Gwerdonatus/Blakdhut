@@ -21,7 +21,7 @@ export default function Header() {
       }`}
       style={{ backdropFilter: scrolled ? "blur(6px)" : "none" }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="w-full px-6 sm:px-10 lg:px-16 xl:px-24 py-4 flex items-center justify-between">
         {/* Logo + wordmark */}
         <Link
           href="/"
@@ -53,6 +53,9 @@ export default function Header() {
           </Link>
           <Link href="/news" className="hover:text-[#f0b90b]">
             News
+          </Link>
+          <Link href="/community" className="hover:text-[#f0b90b]">
+            Community
           </Link>
           <Link href="/policies" className="hover:text-[#f0b90b]">
             Policies
@@ -108,6 +111,13 @@ export default function Header() {
             onClick={() => setMobileOpen(false)}
           >
             News
+          </Link>
+          <Link
+            href="/community"
+            className="block hover:text-[#f0b90b]"
+            onClick={() => setMobileOpen(false)}
+          >
+            Community
           </Link>
           <Link
             href="/policies"
