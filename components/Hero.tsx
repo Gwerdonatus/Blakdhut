@@ -137,7 +137,7 @@ export default function Hero() {
   return (
     <section
       style={{ backgroundColor: COLORS.bg }}
-      className="w-full min-h-screen flex items-center py-12 sm:py-16 lg:py-20"
+      className="w-full min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-20"
     >
       {priceError && (
         <div className="w-full bg-[#F6465D] text-white text-center py-2 text-sm font-medium">
