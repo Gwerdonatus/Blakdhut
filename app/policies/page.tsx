@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
+import Link from "next/link";
 
 export default function PoliciesPage() {
   return (
@@ -71,17 +72,46 @@ export default function PoliciesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                { title: "KYC Verification", text: "All users must pass Know Your Customer (KYC)…" },
-                { title: "No Fraudulent Funds", text: "We do not accept stolen or fraudulent funds…" },
-                { title: "Verified Transactions", text: "Every transaction is confirmed with a blockchain hash…" },
-                { title: "Fraud Monitoring", text: "Our system monitors trades for unusual patterns…" },
+                {
+                  title: "KYC Verification",
+                  text: "All users must pass Know Your Customer (KYC)…",
+                  showButton: true,
+                },
+                {
+                  title: "No Fraudulent Funds",
+                  text: "We do not accept stolen or fraudulent funds…",
+                },
+                {
+                  title: "Verified Transactions",
+                  text: "Every transaction is confirmed with a blockchain hash…",
+                },
+                {
+                  title: "Fraud Monitoring",
+                  text: "Our system monitors trades for unusual patterns…",
+                },
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="p-6 rounded-2xl bg-[#1E2329] border border-[#2B3139]"
+                  className="p-6 rounded-2xl bg-[#1E2329] border border-[#2B3139] hover:border-[#F0B90B]/60 transition-all duration-300"
                 >
-                  <h3 className="text-xl font-semibold text-white mb-3">{item.title}</h3>
-                  <p className="text-[#B7BDC6] text-sm leading-relaxed">{item.text}</p>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-[#B7BDC6] text-sm leading-relaxed">
+                    {item.text}
+                  </p>
+
+                  {/* ✅ Add Yellow KYC Button Only for KYC Card */}
+                  {item.showButton && (
+                    <div className="mt-6">
+                      <Link
+                        href="/verify"
+                        className="inline-block bg-[#F0B90B] text-black font-semibold text-sm px-5 py-3 rounded-lg transition-transform hover:scale-105 hover:shadow-[0_0_20px_#f0b90b50]"
+                      >
+                        Continue your KYC Verification
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
