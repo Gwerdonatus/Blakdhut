@@ -1,4 +1,3 @@
-
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -10,7 +9,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      // sanity asset CDN
       {
         protocol: "https",
         hostname: "cdn.sanity.io",

@@ -11,3 +11,29 @@ body {
 main {
   width: 100%;
 }
+
+
+/* 🌟 Premium Fintech Input Style */
+.input {
+  @apply w-full px-4 py-3 bg-[#222222] border border-gray-700 rounded-xl text-white placeholder-gray-500 outline-none transition-all duration-300;
+}
+.input:focus {
+  @apply border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.3)];
+}
+.input::placeholder {
+  transition: opacity 0.2s ease;
+}
+.input:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Custom dropdown arrow */
+select.input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.85rem;
+  padding-right: 2.5rem;
+}
