@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://www.blakdhut.com/sitemap.xml</loc><lastmod>2025-10-30T21:28:49.546Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com/community</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com/policies</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com/verify</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com/news</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://www.blakdhut.com/news/binance-vs-blakdhut</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod></url>
-<url><loc>https://www.blakdhut.com/news/crypto-trends-2025</loc><lastmod>2025-10-30T21:28:49.547Z</lastmod></url>
+<url><loc>https://www.blakdhut.com/sitemap.xml</loc><lastmod>2025-11-02T21:39:57.369Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com/community</loc><lastmod>2025-11-02T21:39:57.372Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com/news</loc><lastmod>2025-11-02T21:39:57.372Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com/policies</loc><lastmod>2025-11-02T21:39:57.372Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com/verify</loc><lastmod>2025-11-02T21:39:57.372Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com</loc><lastmod>2025-11-02T21:39:57.372Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.blakdhut.com/news/binance-vs-blakdhut</loc><lastmod>2025-11-02T21:39:57.380Z</lastmod></url>
+<url><loc>https://www.blakdhut.com/news/crypto-trends-2025</loc><lastmod>2025-11-02T21:39:57.380Z</lastmod></url>
 </urlset>

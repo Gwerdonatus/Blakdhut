@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import "react-phone-input-2/lib/style.css";
+
 
 const siteName = "BLAKDHUT EXCHANGE";
 const siteUrl = "https://www.blakdhut.com";
 const siteDesc = "Fast. Secure. Reliable Crypto Trading.";
-const siteImage = `${siteUrl}/images/blakdhut.jpg`;
+const siteImage = `${siteUrl}/blakdhut.jpg`; // ✅ Correct path
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -27,9 +29,9 @@ export const metadata: Metadata = {
     "secure crypto trading",
   ],
   icons: {
-    icon: "/images/blakdhut.jpg",
+    icon: "/blakdhut.jpg", // ✅ Match correct path
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: "/blakdhut.jpg",
   },
   openGraph: {
     type: "website",
@@ -58,7 +60,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: "", // ✅ Add your Google Search Console verification code here
+    google: "", // Add your verification code later
   },
 };
 
@@ -70,6 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="canonical" href={siteUrl} />
 
         {/* ✅ Explicit fallbacks for scrapers */}
+        <link rel="icon" href={`${siteUrl}/blakdhut.jpg`} type="image/jpeg" sizes="48x48" />
+        <link rel="apple-touch-icon" href={`${siteUrl}/blakdhut.jpg`} />
         <meta property="og:image" content={siteImage} />
         <meta name="twitter:image" content={siteImage} />
       </head>
@@ -78,7 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1 w-full">{children}</main>
         <Footer />
 
-        {/* ✅ Structured Data for SEO */}
+        {/* ✅ Structured Data for Google logo */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

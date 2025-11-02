@@ -4,16 +4,17 @@ export default {
   type: "document",
   fields: [
     { name: "fullName", title: "Full Name", type: "string" },
-    { name: "email", title: "Email Address", type: "string" },  // ✅ NEW
+    { name: "email", title: "Email Address", type: "string" },
     { name: "occupation", title: "Occupation", type: "string" },
     { name: "country", title: "Country of Residence", type: "string" },
-
     { name: "address", title: "Address", type: "string" },
     { name: "dateOfBirth", title: "Date of Birth", type: "string" },
     { name: "idType", title: "ID Type", type: "string" },
     { name: "idNumber", title: "ID Number", type: "string" },
     { name: "phone", title: "Phone Number", type: "string" },
     { name: "proofType", title: "Proof of Address Type", type: "string" },
+    { name: "sourceOfFunds", title: "Source of Funds", type: "string" },
+    { name: "telegramUsername", title: "Telegram Username", type: "string" },
 
     {
       name: "nationalIdFront",
@@ -33,12 +34,32 @@ export default {
       type: "image",
       options: { hotspot: true },
     },
+
+    // ✅ Supporting Document (can be PDF or image)
     {
-      name: "selfie",
-      title: "Selfie",
-      type: "image",
-      options: { hotspot: true },
+      name: "supportingDocumentType",
+      title: "Supporting Document Type",
+      type: "string",
+      options: {
+        list: [
+          { title: "Bank Statement", value: "Bank Statement" },
+          { title: "Proof of Employment", value: "Proof of Employment" },
+          { title: "Tax Clearance Certificate", value: "Tax Clearance Certificate" },
+          { title: "Business Registration Document", value: "Business Registration Document" },
+          { title: "Reference Letter", value: "Reference Letter" },
+          { title: "Other", value: "Other" },
+        ],
+      },
     },
+    {
+      name: "supportingDocument",
+      title: "Supporting Document (PDF or Image)",
+      type: "file",
+      description: "Upload your supporting document (PDF or image).",
+      options: { accept: [".pdf", ".jpg", ".jpeg", ".png"] },
+    },
+
+    { name: "selfie", title: "Selfie", type: "image", options: { hotspot: true } },
 
     {
       name: "status",

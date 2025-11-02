@@ -5,16 +5,16 @@ import {
   sendKycAdminNotification,
 } from "@/lib/mailer";
 
-// 🧭 Sanity client setup
+// 🧭 Sanity client
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION!,
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2025-01-01",
   token: process.env.SANITY_API_TOKEN!,
   useCdn: false,
 });
 
-// ✅ Helper to upload file to Sanity
+// ✅ Helper for uploading images or files (PDFs allowed)
 const uploadSanityFile = async (file: File | null, type: "image" | "file") => {
   if (!file) return null;
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -29,29 +29,43 @@ const uploadSanityFile = async (file: File | null, type: "image" | "file") => {
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const data = await req.formData();
 
-    const fullName = formData.get("fullName") as string;
-    const email = formData.get("email") as string;
-    const occupation = formData.get("occupation") as string;
-    const dateOfBirth = formData.get("dateOfBirth") as string;
-    const phone = formData.get("phone") as string;
-    const address = formData.get("address") as string;
-    const country = formData.get("country") as string;
-    const idType = formData.get("idType") as string;
-    const idNumber = formData.get("idNumber") as string;
-    const proofType = formData.get("proofType") as string;
+    // 🧩 Text fields
+    const fullName = data.get("fullName") as string;
+    const email = data.get("email") as string;
+    const occupation = data.get("occupation") as string;
+    const dateOfBirth = data.get("dateOfBirth") as string;
+    const phone = data.get("phone") as string;
+    const address = data.get("address") as string;
+    const country = data.get("country") as string;
+    const idType = data.get("idType") as string;
+    const idNumber = data.get("idNumber") as string;
+    const proofType = data.get("proofType") as string;
+    const sourceOfFunds = data.get("sourceOfFunds") as string;
+    const telegramUsername = data.get("telegramUsername") as string;
+    const supportingDocumentType = data.get("supportingDocumentType") as string;
 
-    const nationalIdFrontFile = formData.get("nationalIdFront") as File | null;
-    const nationalIdBackFile = formData.get("nationalIdBack") as File | null;
-    const utilityBillFile = formData.get("utilityBill") as File | null;
-    const selfieFile = formData.get("selfie") as File | null;
+    // 🧩 Files
+    const idFrontFile = data.get("idFront") as File | null;
+    const idBackFile = data.get("idBack") as File | null;
+    const utilityBillFile = data.get("utilityBill") as File | null;
+    const supportingDocumentFile = data.get("supportingDocument") as File | null;
+    const selfieFile = data.get("selfie") as File | null;
 
-    const nationalIdFront = await uploadSanityFile(nationalIdFrontFile, "image");
-    const nationalIdBack = await uploadSanityFile(nationalIdBackFile, "image");
+    // ✅ Upload files to Sanity
+    const nationalIdFront = await uploadSanityFile(idFrontFile, "image");
+    const nationalIdBack = await uploadSanityFile(idBackFile, "image");
     const utilityBill = await uploadSanityFile(utilityBillFile, "image");
     const selfie = await uploadSanityFile(selfieFile, "image");
 
+    // ✅ Supporting document (always upload as file to support PDF)
+    const supportingDocument = await uploadSanityFile(
+      supportingDocumentFile,
+      "file"
+    );
+
+    // ✅ Save to Sanity
     const result = await client.create({
       _type: "kycSubmission",
       fullName,
@@ -64,6 +78,10 @@ export async function POST(req: NextRequest) {
       idType,
       idNumber,
       proofType,
+      sourceOfFunds,
+      telegramUsername,
+      supportingDocumentType,
+      supportingDocument,
       nationalIdFront,
       nationalIdBack,
       utilityBill,
@@ -72,10 +90,8 @@ export async function POST(req: NextRequest) {
       submittedAt: new Date().toISOString(),
     });
 
-    // ✅ Send "Pending" email to user
+    // ✅ Notify user + admin
     if (email) await sendKycPendingEmail(email, fullName);
-
-    // ✅ Notify admin of new submission
     await sendKycAdminNotification({
       fullName,
       email,

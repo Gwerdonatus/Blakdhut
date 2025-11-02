@@ -37,3 +37,31 @@ select.input {
   background-size: 0.85rem;
   padding-right: 2.5rem;
 }
+
+.react-datepicker {
+  background-color: #12161c !important;
+  border: 1px solid #27313d !important;
+  color: white !important;
+  border-radius: 10px !important;
+}
+.react-datepicker__header {
+  background-color: #12161c !important;
+  border-bottom: 1px solid #27313d !important;
+}
+.react-datepicker__day {
+  color: white !important;
+}
+.react-datepicker__day--selected {
+  background-color: #f0b90b !important;
+  color: #000 !important;
+  border-radius: 9999px !important;
+}
+.react-datepicker__day:hover {
+  background-color: rgba(240, 185, 11, 0.25) !important;
+  border-radius: 9999px !important;
+}
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #f0b90b !important;
+}
