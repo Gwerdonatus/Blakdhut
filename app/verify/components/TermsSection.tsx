@@ -1,83 +1,68 @@
 "use client";
-
 import React from "react";
-import {
-  ShieldCheck,
-  Lock,
-  Clock,
-  ExternalLink,
-  CheckCircle2,
-  FileText,
-} from "lucide-react";
+import { CheckCircle2, ExternalLink, Shield, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function TermsSection({ termsAccepted, setTermsAccepted }: any) {
   return (
-    <div className="w-full max-w-lg mt-8 bg-[#12161c]/95 border border-[#1f2937] rounded-2xl shadow-[0_0_15px_rgba(240,185,11,0.05)] p-6">
-      <div className="flex items-start gap-3">
-        <ShieldCheck
-          size={22}
-          className="text-[#f0b90b] mt-0.5 drop-shadow-[0_0_3px_rgba(240,185,11,0.6)]"
-        />
-        <div className="flex-1">
-          <h4 className="font-semibold text-white">Terms & Conditions</h4>
-          <p className="text-sm text-gray-300 mt-1 leading-relaxed">
-            Before completing your KYC verification, please review and agree to
-            our compliance terms. We ensure your data is handled securely in
-            accordance with our privacy and AML policies.
-          </p>
+    <div className="w-full max-w-lg mt-6 text-gray-300 text-[13px] space-y-4">
 
-          <div className="flex flex-wrap items-center gap-3 mt-4">
-            <a
-              href="/policies"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[#f0b90b] hover:underline text-sm"
-            >
-              <FileText size={14} />
-              View Full Terms
-              <ExternalLink size={13} className="opacity-80" />
-            </a>
-
-            <button
-              type="button"
-              onClick={() => {
-                setTermsAccepted(true);
-                toast.success("✅ Terms accepted");
-              }}
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border transition-all ${
-                termsAccepted
-                  ? "bg-[#102018] border-[#2b4135] text-green-400"
-                  : "bg-[#1b2430] border-[#27313d] text-gray-200 hover:bg-[#202a36]"
-              }`}
-            >
-              {termsAccepted && <CheckCircle2 size={15} />}
-              {termsAccepted ? "Accepted" : "Accept & Continue"}
-            </button>
-          </div>
-        </div>
+      {/* ✅ Accept line */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => {
+            setTermsAccepted(!termsAccepted);
+            if (!termsAccepted) toast.success("✅ Terms accepted");
+          }}
+          className={`w-5 h-5 flex items-center justify-center rounded border ${
+            termsAccepted
+              ? "bg-[#0f8b31] border-[#0f8b31]"
+              : "border-gray-500 bg-transparent"
+          }`}
+        >
+          {termsAccepted && <CheckCircle2 size={16} />}
+        </button>
+        <span className="text-[13px]">
+          I agree to the{" "}
+          <a
+            href="/policies"
+            target="_blank"
+            className="text-[#f0b90b] hover:underline"
+          >
+            Terms & Compliance Policy
+          </a>
+        </span>
       </div>
 
-      {/* 🔒 Trust Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 text-sm">
-        <div className="flex items-center gap-2 rounded-lg bg-[#0e1318] border border-[#27313d]/80 px-3 py-2">
-          <Lock size={16} className="text-[#f0b90b]" />
-          <span className="text-gray-300">Encrypted Data</span>
+      {/* ✅ Why KYC info */}
+      <div className="p-3 bg-[#12161c] rounded-lg border border-[#1f2937]">
+        <div className="flex items-center gap-2 mb-1">
+          <ShieldCheck size={15} className="text-[#f0b90b]" />
+          <span className="text-white font-medium text-[13px]">
+            Why do I need to verify KYC?
+          </span>
         </div>
-        <div className="flex items-center gap-2 rounded-lg bg-[#0e1318] border border-[#27313d]/80 px-3 py-2">
-          <ShieldCheck size={16} className="text-[#f0b90b]" />
-          <span className="text-gray-300">Manual Review</span>
-        </div>
-        <div className="flex items-center gap-2 rounded-lg bg-[#0e1318] border border-[#27313d]/80 px-3 py-2">
-          <Clock size={16} className="text-[#f0b90b]" />
-          <span className="text-gray-300">Fast Updates</span>
-        </div>
+
+        <ul className="list-disc ml-4 mt-2 space-y-1 text-gray-400 leading-relaxed">
+          <li>Required under Nigerian CBN & SEC regulations</li>
+          <li>Prevents fraud, identity theft & money laundering</li>
+          <li>Ensures safe trading & protects user funds</li>
+          <li>Helps comply with global AML/CFT laws</li>
+          <li>Required before withdrawals & full platform access</li>
+        </ul>
+
+        <a
+          href="/policies"
+          className="text-[#f0b90b] text-xs flex items-center gap-1 mt-2 hover:underline"
+          target="_blank"
+        >
+          Learn more about KYC compliance <ExternalLink size={12} />
+        </a>
       </div>
 
-      {/* ✨ Footer strip */}
-      <div className="mt-6 border-t border-[#1f2937] pt-3 text-center text-[12px] text-gray-500">
-        Powered by <span className="text-[#f0b90b] font-medium">Blakdhut Compliance</span>
-      </div>
+      <p className="text-[11px] text-center text-gray-500 mt-2">
+        We never share your data. Verified securely by Blakdhut Compliance.
+      </p>
     </div>
   );
 }
