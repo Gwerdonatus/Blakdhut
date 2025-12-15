@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { JSX, useRef } from "react";
 import { X, FileText } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import toast from "react-hot-toast";
