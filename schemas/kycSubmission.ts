@@ -31,8 +31,8 @@ export default {
     {
       name: "utilityBill",
       title: "Utility Bill",
-      type: "image",
-      options: { hotspot: true },
+      type: "file",
+      options: { accept: [".pdf", ".jpg", ".jpeg", ".png"] },
     },
 
     // ✅ Supporting Document (can be PDF or image)
@@ -80,6 +80,36 @@ export default {
       title: "Submitted At",
       type: "datetime",
       initialValue: () => new Date().toISOString(),
+    },
+
+    // ✅ Business Verification
+    {
+      name: "businessAccount",
+      title: "Has Business Account",
+      type: "string",
+      options: {
+        list: [
+          { title: "Yes", value: "yes" },
+          { title: "No", value: "no" },
+        ],
+      },
+    },
+    {
+      name: "businessName",
+      title: "Business Name",
+      type: "string",
+    },
+    {
+      name: "cacCertificate",
+      title: "CAC Certificate",
+      type: "file",
+      options: { accept: [".pdf", ".jpg", ".jpeg", ".png"] },
+    },
+    {
+      name: "registrationApplication",
+      title: "Application for Registration",
+      type: "file",
+      options: { accept: [".pdf", ".jpg", ".jpeg", ".png"] },
     },
   ],
 };

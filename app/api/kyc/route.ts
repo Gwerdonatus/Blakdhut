@@ -1,9 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"; 
 import { createClient } from "@sanity/client";
 import {
   sendKycPendingEmail,
   sendKycAdminNotification,
 } from "@/lib/mailer";
+
+// Debug logs – remove these once it's working!
+console.log("🔍 Sanity Config Debug:");
+console.log("Project ID:", process.env.NEXT_PUBLIC_SANITY_PROJECT_ID);
+console.log("Dataset:", process.env.NEXT_PUBLIC_SANITY_DATASET);
+console.log("API Version:", process.env.NEXT_PUBLIC_SANITY_API_VERSION);
+console.log("Token present:", !!process.env.SANITY_API_TOKEN);
 
 // 🧭 Sanity client
 const client = createClient({
@@ -11,20 +18,25 @@ const client = createClient({
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2025-01-01",
   token: process.env.SANITY_API_TOKEN!,
-  useCdn: false,
+  useCdn: false, // Important for writes/uploads
 });
 
 // ✅ Helper for uploading images or files (PDFs allowed)
 const uploadSanityFile = async (file: File | null, type: "image" | "file") => {
   if (!file) return null;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const uploaded = await client.assets.upload(type, buffer, {
-    filename: file.name,
-  });
-  return {
-    _type: type,
-    asset: { _type: "reference", _ref: uploaded._id },
-  };
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploaded = await client.assets.upload(type, buffer, {
+      filename: file.name,
+    });
+    return {
+      _type: type,
+      asset: { _type: "reference", _ref: uploaded._id },
+    };
+  } catch (err) {
+    console.error(`Failed to upload ${file.name}:`, err);
+    throw err; // Let the main error handler catch it
+  }
 };
 
 export async function POST(req: NextRequest) {
@@ -45,6 +57,8 @@ export async function POST(req: NextRequest) {
     const sourceOfFunds = data.get("sourceOfFunds") as string;
     const telegramUsername = data.get("telegramUsername") as string;
     const supportingDocumentType = data.get("supportingDocumentType") as string;
+    const businessAccount = data.get("businessAccount") as string;
+    const businessName = data.get("businessName") as string;
 
     // 🧩 Files
     const idFrontFile = data.get("idFront") as File | null;
@@ -52,18 +66,27 @@ export async function POST(req: NextRequest) {
     const utilityBillFile = data.get("utilityBill") as File | null;
     const supportingDocumentFile = data.get("supportingDocument") as File | null;
     const selfieFile = data.get("selfie") as File | null;
+    const cacCertificateFile = data.get("cacCertificate") as File | null;
+    const registrationApplicationFile = data.get("registrationApplication") as File | null;
 
-    // ✅ Upload files to Sanity
-    const nationalIdFront = await uploadSanityFile(idFrontFile, "image");
-    const nationalIdBack = await uploadSanityFile(idBackFile, "image");
-    const utilityBill = await uploadSanityFile(utilityBillFile, "image");
-    const selfie = await uploadSanityFile(selfieFile, "image");
-
-    // ✅ Supporting document (always upload as file to support PDF)
-    const supportingDocument = await uploadSanityFile(
-      supportingDocumentFile,
-      "file"
-    );
+    // ✅ Upload files to Sanity (in parallel where possible)
+    const [
+      nationalIdFront,
+      nationalIdBack,
+      utilityBill,
+      selfie,
+      supportingDocument,
+      cacCertificate,
+      registrationApplication,
+    ] = await Promise.all([
+      uploadSanityFile(idFrontFile, "image"),
+      uploadSanityFile(idBackFile, "image"),
+      uploadSanityFile(utilityBillFile, "file"),
+      uploadSanityFile(selfieFile, "image"),
+      uploadSanityFile(supportingDocumentFile, "file"),
+      uploadSanityFile(cacCertificateFile, "file"),
+      uploadSanityFile(registrationApplicationFile, "file"),
+    ]);
 
     // ✅ Save to Sanity
     const result = await client.create({
@@ -82,6 +105,10 @@ export async function POST(req: NextRequest) {
       telegramUsername,
       supportingDocumentType,
       supportingDocument,
+      businessAccount,
+      businessName,
+      cacCertificate,
+      registrationApplication,
       nationalIdFront,
       nationalIdBack,
       utilityBill,

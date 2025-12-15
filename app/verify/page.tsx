@@ -76,9 +76,11 @@ type KYCFormData = {
   idFront: File | null;
   idBack: File | null;
   utilityBill: File | null;
-  supportingDocumentType: string;
-  supportingDocument: File | null;
   selfie: File | null;
+  businessAccount: "yes" | "no" | "";
+  businessName: string;
+  cacCertificate: File | null;
+  registrationApplication: File | null;
 };
 
 export default function VerifyPage() {
@@ -115,9 +117,11 @@ export default function VerifyPage() {
     idFront: null,
     idBack: null,
     utilityBill: null,
-    supportingDocumentType: "",
-    supportingDocument: null,
     selfie: null,
+    businessAccount: "",
+    businessName: "",
+    cacCertificate: null,
+    registrationApplication: null,
   });
 
   // ✅ Email validation
@@ -175,19 +179,32 @@ export default function VerifyPage() {
     fetchCountries();
   }, []);
 
-  // ✅ Helper to preview images
-  const renderFilePreview = (file: File | null) =>
-    file ? (
-      <motion.img
-        key={file.name}
-        src={URL.createObjectURL(file)}
-        alt="Preview"
-        className="w-full max-w-xs h-32 object-cover rounded-lg mt-3 border border-[#27313d]"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-      />
-    ) : null;
+  // ✅ Helper to preview images or PDFs
+  const renderFilePreview = (file: File | null) => {
+    if (!file) return null;
+
+    if (file.type === "application/pdf") {
+      return (
+        <div className="mt-3 flex items-center gap-2 text-gray-300 bg-[#12161c] border border-[#27313d] p-3 rounded-md">
+          <FileText size={24} />
+          <span>{file.name}</span>
+          <span className="text-sm">({Math.round(file.size / 1024)} KB)</span>
+        </div>
+      );
+    } else {
+      return (
+        <motion.img
+          key={file.name}
+          src={URL.createObjectURL(file)}
+          alt="Preview"
+          className="w-full max-w-xs h-32 object-cover rounded-lg mt-3 border border-[#27313d]"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        />
+      );
+    }
+  };
 
   // ✅ Validate each step
   const validateStep = (): boolean => {
@@ -231,10 +248,12 @@ export default function VerifyPage() {
           newErrors.utilityBill = "Upload a document";
         break;
       case 5:
-        if (!formData.supportingDocumentType)
-          newErrors.supportingDocumentType = "Document type required";
-        if (!formData.supportingDocument)
-          newErrors.supportingDocument = "Upload supporting document";
+        if (!formData.businessAccount) newErrors.businessAccount = "Please select if you have a business";
+        if (formData.businessAccount === "yes") {
+          if (!formData.businessName) newErrors.businessName = "Business name is required";
+          if (!formData.cacCertificate) newErrors.cacCertificate = "CAC Certificate required";
+          if (!formData.registrationApplication) newErrors.registrationApplication = "Registration document required";
+        }
         break;
       case 6:
         if (!formData.selfie) newErrors.selfie = "Selfie required";
@@ -248,12 +267,35 @@ export default function VerifyPage() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const maxSizeMB = 10;
+    if (file.size / 1024 / 1024 > maxSizeMB) {
+      toast.error("File too large (max 10MB)");
+      return;
+    }
+
+    let isImage = file.type.startsWith("image/");
+    let allowed = false;
+
+    if (step === 2 || step === 3) {
+      if (isImage) allowed = true;
+      else toast.error("Only image files are allowed for ID uploads");
+    } else if (step === 4) {
+      if (isImage || file.type === "application/pdf") allowed = true;
+      else toast.error("Only PDF or image files are allowed");
+    }
+
+    if (!allowed) return;
+
     try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-      });
+      let finalFile = file;
+      if (isImage) {
+        finalFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        });
+      }
       const field =
         step === 2
           ? "idFront"
@@ -261,14 +303,13 @@ export default function VerifyPage() {
           ? "idBack"
           : step === 4
           ? "utilityBill"
-          : step === 5
-          ? "supportingDocument"
           : null;
       if (field)
         setFormData((prev) => ({
           ...prev,
-          [field]: compressed,
+          [field]: finalFile,
         }));
+      toast.success("File added successfully ✅");
     } catch {
       toast.error("File upload failed");
     }
@@ -276,6 +317,10 @@ export default function VerifyPage() {
 
   // ✅ Submit form
   const submitForm = async () => {
+    if (!termsAccepted) {
+      toast.error("Please accept the terms and conditions");
+      return;
+    }
     if (!validateStep()) return;
     try {
       setLoading(true);
@@ -414,7 +459,6 @@ export default function VerifyPage() {
             )}
             {step === 5 && (
               <StepSupportingDocument
-                fileInputRef={fileInputRef}
                 formData={formData}
                 setFormData={setFormData}
                 errors={errors}
