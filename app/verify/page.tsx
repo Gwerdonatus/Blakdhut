@@ -100,6 +100,8 @@ export default function VerifyPage() {
   } | null>(null);
   const [loadingCountries, setLoadingCountries] = useState(true);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const termsSectionRef = useRef<HTMLDivElement>(null);
+  const [termsError, setTermsError] = useState(false);
 
   const [formData, setFormData] = useState<KYCFormData>({
     fullName: "",
@@ -317,11 +319,17 @@ export default function VerifyPage() {
 
   // ✅ Submit form
   const submitForm = async () => {
+    setTermsError(false);
+
     if (!termsAccepted) {
-      toast.error("Please accept the terms and conditions");
+      setTermsError(true);
+      toast.error("Please accept the terms and conditions before submitting");
+      termsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
+
     if (!validateStep()) return;
+
     try {
       setLoading(true);
       const data = new FormData();
@@ -506,10 +514,18 @@ export default function VerifyPage() {
       </div>
 
       {/* Terms Section */}
-      <TermsSection
-        termsAccepted={termsAccepted}
-        setTermsAccepted={setTermsAccepted}
-      />
+      <div ref={termsSectionRef} className="mt-8 w-full max-w-lg">
+        <TermsSection
+  termsAccepted={termsAccepted}
+  setTermsAccepted={(accepted: boolean) => setTermsAccepted(accepted)}
+/>
+
+        {termsError && (
+          <p className="text-red-500 text-sm mt-2 text-center">
+            Please accept the terms and conditions to proceed
+          </p>
+        )}
+      </div>
 
       {/* Confetti Success */}
       {showConfetti && (

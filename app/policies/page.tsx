@@ -72,23 +72,24 @@ export default function PoliciesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                {
-                  title: "KYC Verification",
-                  text: "All users must pass Know Your Customer (KYC)…",
-                  showButton: true,
-                },
-                {
-                  title: "No Fraudulent Funds",
-                  text: "We do not accept stolen or fraudulent funds…",
-                },
-                {
-                  title: "Verified Transactions",
-                  text: "Every transaction is confirmed with a blockchain hash…",
-                },
-                {
-                  title: "Fraud Monitoring",
-                  text: "Our system monitors trades for unusual patterns…",
-                },
+              {
+                title: "KYC Verification",
+                text: "To maintain a secure and compliant platform, all users are required to complete Know Your Customer (KYC) verification. This process helps us confirm your identity, prevent impersonation, and protect the community from fraud, money laundering, and unauthorized activity. Your information is handled securely and used strictly for compliance and safety purposes.",
+                showButton: true,
+              },
+              {
+                title: "No Fraudulent or Illicit Funds",
+                text: "Blakdhut operates under a strict zero-tolerance policy for stolen, hacked, or illicit funds. Transactions linked to fraud, chargebacks, scams, or illegal sources are immediately flagged and rejected. This policy protects honest users and ensures the long-term integrity of the platform.",
+              },
+              {
+                title: "Verified & Traceable Transactions",
+                text: "Every transaction processed on Blakdhut is verified and recorded with a unique blockchain transaction hash. This allows full traceability, transparency, and independent verification on the blockchain, ensuring that all transfers are authentic and irreversible once confirmed.",
+              },
+              {
+                title: "Advanced Fraud Monitoring",
+                text: "Our systems continuously monitor transactions for unusual patterns, suspicious behavior, or abnormal activity. When potential risks are detected, transactions may be delayed, reviewed, or blocked to prevent losses and protect both users and the platform.",
+              },
+
               ].map((item, i) => (
                 <div
                   key={i}
