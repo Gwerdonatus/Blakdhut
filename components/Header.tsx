@@ -45,6 +45,12 @@ export default function Header() {
           <Link href="/#services" className="hover:text-[#f0b90b]">
             Services
           </Link>
+
+          {/* NEW */}
+          <Link href="/prop-funding" className="hover:text-[#f0b90b]">
+            Prop Funding
+          </Link>
+
           <Link href="/#testimonials" className="hover:text-[#f0b90b]">
             Testimonials
           </Link>
@@ -91,6 +97,16 @@ export default function Header() {
           >
             Services
           </Link>
+
+          {/* NEW */}
+          <Link
+            href="/prop-funding"
+            className="block hover:text-[#f0b90b]"
+            onClick={() => setMobileOpen(false)}
+          >
+            Prop Funding
+          </Link>
+
           <Link
             href="/#testimonials"
             className="block hover:text-[#f0b90b]"
@@ -126,6 +142,7 @@ export default function Header() {
           >
             Policies
           </Link>
+
           <Link
             href="https://t.me/blakdhute"
             className="block px-4 py-2 rounded-lg font-semibold bg-[#f0b90b] text-black hover:bg-[#e2aa06] transition"
