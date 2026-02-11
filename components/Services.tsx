@@ -1,5 +1,11 @@
 "use client";
-import { FaExchangeAlt, FaWallet, FaCoins, FaBuilding } from "react-icons/fa";
+import {
+  FaExchangeAlt,
+  FaWallet,
+  FaCoins,
+  FaBuilding,
+  FaChartLine,
+} from "react-icons/fa";
 import Link from "next/link";
 
 const COLORS = {
@@ -35,6 +41,14 @@ const SERVICES = [
     title: "Business Solutions",
     desc: "Empowering entrepreneurs and companies with structured crypto support. From vendor payments and international settlements to bulk liquidity needs, Blakdhut provides reliable, scalable solutions tailored to business operations.",
     link: "/blog/business-solutions",
+  },
+
+  // ✅ NEW SERVICE: Prop Funding
+  {
+    icon: <FaChartLine className="text-[#F0B90B] text-3xl" />,
+    title: "Prop Firm Funding",
+    desc: "Fast, structured prop firm funding using USDT/USDC. Share your prop firm and account size, get a clear confirmation of total + fee, then we execute — no card stress, no P2P delays.",
+    link: "/prop-funding",
   },
 ];
 
@@ -79,11 +93,11 @@ export default function Services() {
                 </p>
               </div>
 
-              {/* Slim Button */}
+              {/* Slim Button (now uses each service link) */}
               <div className="mt-3">
                 <Link
-                  href="/policies#about-video"
-                  className="inline-block px-4 py-1.5 rounded-md font-medium text-sm transition"
+                  href={s.link}
+                  className="inline-block px-4 py-1.5 rounded-md font-medium text-sm transition hover:opacity-95"
                   style={{
                     backgroundColor: COLORS.yellow,
                     color: "#0B0E11",
