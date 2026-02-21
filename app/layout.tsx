@@ -3,12 +3,12 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "react-phone-input-2/lib/style.css";
-
+import TikTokPixel from "./tiktok-pixel";
 
 const siteName = "BLAKDHUT EXCHANGE";
 const siteUrl = "https://www.blakdhut.com";
 const siteDesc = "Fast. Secure. Reliable Crypto Trading.";
-const siteImage = `${siteUrl}/blakdhut.jpg`; // ✅ Correct path
+const siteImage = `${siteUrl}/blakdhut.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "secure crypto trading",
   ],
   icons: {
-    icon: "/blakdhut.jpg", // ✅ Match correct path
+    icon: "/blakdhut.jpg",
     shortcut: "/favicon.ico",
     apple: "/blakdhut.jpg",
   },
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: "", // Add your verification code later
+    google: "",
   },
 };
 
@@ -77,7 +77,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:image" content={siteImage} />
         <meta name="twitter:image" content={siteImage} />
       </head>
+
       <body className="bg-[#181A20] text-white flex flex-col min-h-screen w-full overflow-x-hidden">
+        {/* ✅ TikTok Pixel (loads once for entire site) */}
+        <TikTokPixel />
+
         <Header />
         <main className="flex-1 w-full">{children}</main>
         <Footer />
