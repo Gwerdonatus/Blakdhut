@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+// @ts-ignore: No type declarations for CSS import
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+// @ts-ignore: No type declarations for package CSS import
 import "react-phone-input-2/lib/style.css";
 import TikTokPixel from "./tiktok-pixel";
 

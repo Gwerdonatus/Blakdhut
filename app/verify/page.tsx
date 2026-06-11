@@ -12,7 +12,7 @@ import StepIDType from "./components/StepIDType";
 import StepUploadFront from "./components/StepUploadFront";
 import StepUploadBack from "./components/StepUploadBack";
 import StepProofOfAddress from "./components/StepProofOfAddress";
-import StepSupportingDocument from "./components/StepSupportingDocument"; 
+import StepSupportingDocument from "./components/StepSupportingDocument";
 import StepSelfie from "./components/StepSelfie";
 import TermsSection from "./components/TermsSection";
 import ConfettiModal from "./components/ConfettiModal";
@@ -58,6 +58,38 @@ const sourceOfFundsOptions = [
   "Remittance (Family or Friends)",
   "Mining / Staking",
   "Other",
+];
+
+// ✅ Comprehensive fallback country list (used if API fails)
+const FALLBACK_COUNTRIES = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina",
+  "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
+  "Bangladesh", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+  "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria",
+  "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada",
+  "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros",
+  "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+  "Denmark", "Djibouti", "Dominican Republic", "Ecuador", "Egypt",
+  "El Salvador", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji",
+  "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana",
+  "Greece", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
+  "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq",
+  "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+  "Kenya", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho",
+  "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar",
+  "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius",
+  "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco",
+  "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand",
+  "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
+  "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru",
+  "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
+  "Saudi Arabia", "Senegal", "Serbia", "Sierra Leone", "Singapore", "Slovakia",
+  "Slovenia", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain",
+  "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan",
+  "Tajikistan", "Tanzania", "Thailand", "Togo", "Trinidad and Tobago",
+  "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
+  "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+  "Uzbekistan", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
 ];
 
 type KYCFormData = {
@@ -139,45 +171,89 @@ export default function VerifyPage() {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  // ✅ Fetch country list once
+  // ✅ Build option object from a country name (no flag)
+  const buildFallbackOption = (name: string) => ({
+    value: name,
+    label: (
+      <div className="flex items-center gap-2">
+        <span>{name}</span>
+      </div>
+    ),
+  });
+
+  // ✅ Build option object from API data (with flag)
+  const buildApiOption = (c: any) => ({
+    value: c.name.common,
+    label: (
+      <div className="flex items-center gap-2">
+        <img
+          src={c.flags?.png}
+          alt={`${c.name.common} flag`}
+          width={20}
+          height={14}
+          className="rounded-sm object-cover"
+          onError={(e) => {
+            // Hide broken flag images silently
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+        <span>{c.name.common}</span>
+      </div>
+    ),
+  });
+
+  // ✅ Set Nigeria as default helper
+  const applyNigeriaDefault = (
+    list: { value: string; label: JSX.Element }[]
+  ) => {
+    const nigeria = list.find(
+      (c) => c.value.toLowerCase() === "nigeria"
+    );
+    if (nigeria) {
+      setSelectedCountry(nigeria);
+      setFormData((prev) => ({ ...prev, country: nigeria.value }));
+    }
+  };
+
+  // ✅ Fetch country list — with automatic fallback if API fails
   useEffect(() => {
     const fetchCountries = async () => {
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
         const res = await fetch(
-          "https://restcountries.com/v3.1/all?fields=name,flags"
+          "https://restcountries.com/v3.1/all?fields=name,flags",
+          { signal: controller.signal }
         );
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const data = await res.json();
-        const list = data
-          .map((c: any) => ({
-            value: c.name.common,
-            label: (
-              <div className="flex items-center gap-2">
-                <img
-                  src={c.flags?.png}
-                  alt={`${c.name.common} flag`}
-                  width={20}
-                  height={14}
-                  className="rounded-sm"
-                />
-                <span>{c.name.common}</span>
-              </div>
-            ),
-          }))
-          .sort((a: any, b: any) => a.value.localeCompare(b.value));
-        setCountryOptions(list);
-        const nigeria = list.find(
-          (c: any) => c.value.toLowerCase() === "nigeria"
-        );
-        if (nigeria) {
-          setSelectedCountry(nigeria);
-          setFormData((prev) => ({ ...prev, country: nigeria.value }));
+
+        if (!Array.isArray(data) || data.length === 0) {
+          throw new Error("Empty or invalid response");
         }
-      } catch {
-        toast.error("Failed to load countries");
+
+        const list = data
+          .map(buildApiOption)
+          .sort((a, b) => a.value.localeCompare(b.value));
+
+        setCountryOptions(list);
+        applyNigeriaDefault(list);
+      } catch (err) {
+        // API failed — silently fall back to hardcoded list
+        console.warn("Country API unavailable, using fallback list:", err);
+
+        const list = FALLBACK_COUNTRIES.map(buildFallbackOption);
+        setCountryOptions(list);
+        applyNigeriaDefault(list);
       } finally {
         setLoadingCountries(false);
       }
     };
+
     fetchCountries();
   }, []);
 
@@ -233,7 +309,7 @@ export default function VerifyPage() {
         if (!formData.idType) newErrors.idType = "ID type is required";
         if (
           (formData.idType === "NIN" ||
-            formData.idType === "Driver’s License") &&
+            formData.idType === "Driver's License") &&
           !formData.idNumber
         )
           newErrors.idNumber = "ID number is required";
@@ -250,11 +326,15 @@ export default function VerifyPage() {
           newErrors.utilityBill = "Upload a document";
         break;
       case 5:
-        if (!formData.businessAccount) newErrors.businessAccount = "Please select if you have a business";
+        if (!formData.businessAccount)
+          newErrors.businessAccount = "Please select if you have a business";
         if (formData.businessAccount === "yes") {
-          if (!formData.businessName) newErrors.businessName = "Business name is required";
-          if (!formData.cacCertificate) newErrors.cacCertificate = "CAC Certificate required";
-          if (!formData.registrationApplication) newErrors.registrationApplication = "Registration document required";
+          if (!formData.businessName)
+            newErrors.businessName = "Business name is required";
+          if (!formData.cacCertificate)
+            newErrors.cacCertificate = "CAC Certificate required";
+          if (!formData.registrationApplication)
+            newErrors.registrationApplication = "Registration document required";
         }
         break;
       case 6:
@@ -324,7 +404,10 @@ export default function VerifyPage() {
     if (!termsAccepted) {
       setTermsError(true);
       toast.error("Please accept the terms and conditions before submitting");
-      termsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      termsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       return;
     }
 
@@ -341,7 +424,7 @@ export default function VerifyPage() {
       const result = await res.json();
       if (!res.ok) throw new Error(result?.message || "Submission failed");
 
-      toast.success("🎉 KYC submitted! We’ll review within 24 hours.");
+      toast.success("🎉 KYC submitted! We'll review within 24 hours.");
       setShowConfetti(true);
       setStep(0);
     } catch (err: any) {
@@ -516,10 +599,9 @@ export default function VerifyPage() {
       {/* Terms Section */}
       <div ref={termsSectionRef} className="mt-8 w-full max-w-lg">
         <TermsSection
-  termsAccepted={termsAccepted}
-  setTermsAccepted={(accepted: boolean) => setTermsAccepted(accepted)}
-/>
-
+          termsAccepted={termsAccepted}
+          setTermsAccepted={(accepted: boolean) => setTermsAccepted(accepted)}
+        />
         {termsError && (
           <p className="text-red-500 text-sm mt-2 text-center">
             Please accept the terms and conditions to proceed

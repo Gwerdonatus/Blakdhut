@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Ensure this stays imported
 import PhoneInput from "react-phone-input-2";
 import dynamic from "next/dynamic";
+
+// Import DatePicker styles
+require("react-datepicker/dist/react-datepicker.css");
 
 const Select = dynamic(() => import("react-select"), { ssr: false });
 
@@ -126,7 +128,7 @@ export default function StepBasicInfo({
             setErrors((prev: any) => ({ ...prev, dateOfBirth: "" }));
           }}
           placeholderText="Select Date of Birth"
-          className={`${inputClass} !bg-[#12161c] cursor-pointer text-white`}
+          className={`${inputClass} bg-[#12161c]! cursor-pointer text-white`}
           dateFormat="dd MMM yyyy"
           showYearDropdown
           showMonthDropdown
