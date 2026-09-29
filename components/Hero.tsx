@@ -107,18 +107,26 @@ export default function Hero() {
         : (newCoins?.map((c: any) => c.coingeckoId) ?? []);
     if (!ids.length) return;
 
-    fetchPrices(ids)
-      .then((data) => {
-        setPrices(data);
-        setPriceError(false);
-      })
-      .catch(() => setPriceError(true));
+    let isActive = true;
+    const refreshPrices = () => {
+      fetchPrices(ids)
+        .then((data) => {
+          if (!isActive) return;
+          setPrices(data);
+          setPriceError(false);
+        })
+        .catch(() => {
+          if (isActive) setPriceError(true);
+        });
+    };
 
-    const t = setInterval(() => {
-      fetchPrices(ids).then(setPrices).catch(() => setPriceError(true));
-    }, 60_000);
+    refreshPrices();
+    const t = setInterval(refreshPrices, 60_000);
 
-    return () => clearInterval(t);
+    return () => {
+      isActive = false;
+      clearInterval(t);
+    };
   }, [active, newCoins]);
 
   const list: CoinRow[] = useMemo(() => {
@@ -244,15 +252,18 @@ export default function Hero() {
                     </div>
                     <div className="flex items-center gap-4 mt-2 sm:mt-0">
                       <span className="text-sm text-white font-medium">
-                        {price
+                        {price !== null
                           ? `$${price.toLocaleString()}`
                           : "— Price unavailable"}
                       </span>
                       <span
                         className="text-sm font-medium"
-                        style={{ color: change ? changeColor : COLORS.subtext }}
+                        style={{
+                          color:
+                            change !== null ? changeColor : COLORS.subtext,
+                        }}
                       >
-                        {change ? `${change.toFixed(2)}%` : "—"}
+                        {change !== null ? `${change.toFixed(2)}%` : "—"}
                       </span>
                     </div>
                   </div>
