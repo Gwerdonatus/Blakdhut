@@ -41,6 +41,17 @@ async function fetchPrices(ids: string[]): Promise<Record<string, PriceData>> {
   return res.json();
 }
 
+function formatPrice(price: number) {
+  const maximumFractionDigits = price >= 100 ? 2 : price >= 1 ? 3 : 4;
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits,
+  }).format(price);
+}
+
 export default function Hero() {
   const [moved, setMoved] = useState<number>(10200000); // ✅ Start at 10.2M
   const [displayed, setDisplayed] = useState<number>(10200000);
@@ -227,13 +238,13 @@ export default function Hero() {
                 return (
                   <div
                     key={c.id}
-                    className="flex flex-wrap sm:flex-nowrap items-center justify-between rounded-xl px-4 py-3"
+                    className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:gap-4 rounded-xl px-3 sm:px-4 py-3"
                     style={{
                       backgroundColor: COLORS.bg,
                       border: `1px solid ${COLORS.border}`,
                     }}
                   >
-                    <div className="flex items-center gap-3 min-w-[120px]">
+                    <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                       <Image
                         src={
                           typeof c.logo === "string"
@@ -245,27 +256,24 @@ export default function Hero() {
                         height={24}
                         className="rounded-full h-6 w-6"
                       />
-                      <span className="text-sm text-white font-semibold">
+                      <span className="shrink-0 text-sm text-white font-semibold">
                         {c.symbol}
                       </span>
-                      <span className="text-sm text-[#B7BDC6]">{c.name}</span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                      <span className="text-sm text-white font-medium">
-                        {price !== null
-                          ? `$${price.toLocaleString()}`
-                          : "— Price unavailable"}
-                      </span>
-                      <span
-                        className="text-sm font-medium"
-                        style={{
-                          color:
-                            change !== null ? changeColor : COLORS.subtext,
-                        }}
-                      >
-                        {change !== null ? `${change.toFixed(2)}%` : "—"}
+                      <span className="truncate text-sm text-[#B7BDC6]">
+                        {c.name}
                       </span>
                     </div>
+                    <span className="whitespace-nowrap text-xs sm:text-sm text-white font-medium tabular-nums">
+                      {price !== null ? formatPrice(price) : "—"}
+                    </span>
+                    <span
+                      className="whitespace-nowrap text-xs sm:text-sm font-medium tabular-nums"
+                      style={{
+                        color: change !== null ? changeColor : COLORS.subtext,
+                      }}
+                    >
+                      {change !== null ? `${change.toFixed(2)}%` : "—"}
+                    </span>
                   </div>
                 );
               })}
